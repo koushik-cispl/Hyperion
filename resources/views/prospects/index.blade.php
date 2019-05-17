@@ -212,12 +212,7 @@
             }
             else
             {
-                var fd = new FormData();
-
-                var files = $('#file')[0].files[0];
-
-                fd.append('file',files);
-                sendingFiles = fd;
+                
             }*/
             var fd = new FormData();
             var files = $('#file')[0].files[0];

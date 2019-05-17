@@ -84,10 +84,10 @@
 
             <div class="user-area dropdown float-right">
                 <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    @if(Session::get('userArray'))
+                    @if(Session::get('userArray')['avatar'])
                         <img class="user-avatar rounded-circle" src="{{ URL::to('/admin_user_images/'.Session::get('userArray')['avatar']) }}" alt="User Avatar">
                     @else
-                        <img class="user-avatar rounded-circle" src="{{asset('back_end/images/admin.jpg')}}" alt="User Avatar">   
+                        <img class="user-avatar rounded-circle" src="{{asset('back_end/images/avatar/avatar.png')}}" alt="User Avatar">   
                     @endif
                 </a>
 
