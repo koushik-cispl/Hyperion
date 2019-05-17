@@ -2153,7 +2153,12 @@ footer.site-footer {
     .calender-cont.widget-calender .fc-day-grid-container {
       max-height: 250px !important;
       overflow: hidden !important; }
-
+ol.breadcrumb.text-right > li.active > a.nav-link {
+    display: inline-block;
+}
+.animated.fadeIn.listingCls .table-stats.order-table.ov-h.userListTable td , table tr td , .table-stats table td {
+    text-transform: none;
+}
 @media (max-width: 1680px) {
   .timeline li {
     padding: 2px 0; } }
