@@ -27,7 +27,7 @@
                             <div class="page-title">
                                 <ol class="breadcrumb text-right">
                                     <li class="active">
-                                    <a class="nav-link" data-toggle="modal" data-target="#csvModal" href="javascript:void(0)"><i class="fa fa-plus"></i> Upload CSV file</a>
+                                    <!-- <a class="nav-link" data-toggle="modal" data-target="#csvModal" href="javascript:void(0)"><i class="fa fa-plus"></i> Upload CSV file</a> -->
                                     <a class="nav-link" href="{{route('prospects.create')}}"><i class="fa fa-plus"></i> Create New Prospect</a>
                                     </li>
                                 </ol>
