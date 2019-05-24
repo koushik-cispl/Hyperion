@@ -40,6 +40,7 @@ Route::post('/admin/delete-user','UserController@deleteUser');
 Route::resource('/admin/prospects', 'ProspectsController');
 Route::post('/admin/statechange','ProspectsController@stateChange');
 Route::post('/admin/uploadcsv','ProspectsController@uploadcsv');
+Route::get('/admin/search-prospect','ProspectsController@searchProspect');
 
 Route::resource('/admin/crm', 'CrmController');
 Route::get('/admin/select-campaign','PlaceOrderController@index');

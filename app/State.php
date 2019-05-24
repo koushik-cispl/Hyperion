@@ -8,8 +8,8 @@ class State extends Model
 {
     Protected $guarded = [];
 
-    function prospectsS()
+    /*function prospectsS()
     {
         return $this->hasMany('App\Prospect', 'id');
-    }
+    }*/
 }

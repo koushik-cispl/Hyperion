@@ -1,5 +1,45 @@
 <!doctype html>
 <html class="no-js" lang="">
+
+<?php
+if(isset($_GET['search']))
+{
+    $serachTerm = $_GET['search'];
+}
+else
+{
+    $serachTerm = '';
+}
+
+if(isset($_GET['page']))
+{
+    $pageCount = $_GET['page'] - 1;
+    $resultCount = 50 * $pageCount;
+}
+else
+{
+    $resultCount = 0;
+}
+
+if(isset($_GET['sort']))
+{
+    $sortBy = $_GET['sort'];
+}
+else
+{
+    $sortBy = '';
+}
+
+if(isset($_GET['direction']))
+{
+    $directionBy = $_GET['direction'];
+}
+else
+{
+    $directionBy = '';
+}
+?>
+
 <head>
     @include('common/base')
 </head>
@@ -27,7 +67,7 @@
                             <div class="page-title">
                                 <ol class="breadcrumb text-right">
                                     <li class="active">
-                                    <!-- <a class="nav-link" data-toggle="modal" data-target="#csvModal" href="javascript:void(0)"><i class="fa fa-plus"></i> Upload CSV file</a> -->
+                                    <a class="nav-link" data-toggle="modal" data-target="#csvModal" href="javascript:void(0)"><i class="fa fa-plus"></i> Upload CSV file</a>
                                     <a class="nav-link" href="{{route('prospects.create')}}"><i class="fa fa-plus"></i> Create New Prospect</a>
                                     </li>
                                 </ol>
@@ -46,6 +86,10 @@
                         <div class="card">
                             <div class="card-header">
                                 <strong class="card-title">Prospect List</strong>
+
+                                <form class="pull-right" autocomplete="off" name="prospectsSearch" id="prospectsSearch" action="{{ action('ProspectsController@searchProspect') }}" method="get">
+                                    <input type="text" name="search" id="search" value="<?php echo $serachTerm; ?>" placeholder=" Search by name">
+                                </form>
                             </div>
 
                             <div class="table-stats order-table ov-h userListTable">
@@ -53,13 +97,12 @@
                                     <thead>
                                         <tr>
                                             <th class="serial">#</th>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Mobile</th>
-                                            <th>Address</th>
-                                            <th>Country</th>
-                                            <th>State</th>
-                                            <th>Created At</th>
+                                            <th>@sortablelink('fname', 'Name')</th>
+                                            <th>@sortablelink('address')</th>
+                                            <th>@sortablelink('state')</th>
+                                            <th>@sortablelink('city')</th>
+                                            <th>Zip Code</th>
+                                            <th>@sortablelink('created_at', 'Created At')</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -67,14 +110,13 @@
                                         @if(!empty($allProspects))
                                             @foreach ($allProspects['data'] as $prospectKey => $prospects)
                                                 <tr>
-                                                    <td class="serial">{{ $prospectKey+1 }}.</td>
+                                                    <td class="serial">{{ $prospectKey+1+$resultCount }}.</td>
                                                     <td> {{ $prospects['fname'].' '.$prospects['lname'] }} </td>
-                                                    <td>  <span class="">{{ $prospects['email'] }}</span> </td>
-                                                    <td> <span class="">{{ $prospects['mobile'] }}</span> </td>
-                                                    <td><span class="">{{ $prospects['address'] }}</span></td>
-                                                    <td><span class="">{{ $prospects['prospects_country']['name'] }}</span></td>
-                                                    <td><span class="">{{ $prospects['prospects_state']['name'] }}</span></td>
-                                                    <td><span class="">{{ $prospects['created_at'] }}</span></td>
+                                                    <td>{{ $prospects['address'] }}</td>
+                                                    <td>{{ $prospects['state'] }}</td>
+                                                    <td>{{ $prospects['city'] }}</td>
+                                                    <td>{{ $prospects['zip_code'] }}</td>
+                                                    <td>{{ $prospects['created_at'] }}</td>
                                                     <td>
                                                         <a class="btn btn-primary userListingAction" href="{{route('prospects.edit',$prospects['id'])}}" role="button" title="Edit Prospect">
                                                             <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
@@ -96,12 +138,36 @@
                             @if(!empty($allProspects))
                             <div class="next_prev">
                                 <div class="col-md-12">
-                                    <?php if($allProspects['prev_page_url'] != '') { ?>
-                                        <a class="btn prev" href="<?php echo $allProspects['prev_page_url'] ?>"> <i class="fa fa-arrow-left"></i> Back</a>
+                                    <?php if($allProspects['prev_page_url'] != '') {
+
+                                        $prev_page_url = $allProspects['prev_page_url'];
+
+                                        if($serachTerm != '')
+                                        {
+                                            $prev_page_url = $prev_page_url.'&search='.$serachTerm;
+                                        }
+                                        if($directionBy != '' || $sortBy != '')
+                                        {
+                                            $prev_page_url = $prev_page_url.'&sort='.$sortBy.'&direction='.$directionBy;
+                                        }
+                                    ?>
+                                        <a class="btn prev" href="<?php echo $prev_page_url; ?>"> <i class="fa fa-arrow-left"></i> Back</a>
                                     <?php } ?>
 
-                                    <?php if($allProspects['next_page_url'] != '') { ?>
-                                        <a class="btn next" href="<?php echo $allProspects['next_page_url'] ?>"> <i class="fa fa-arrow-right"></i> Next</a>
+                                    <?php if($allProspects['next_page_url'] != '') {
+                                        
+                                        $next_page_url = $allProspects['next_page_url'];
+
+                                        if($serachTerm != '')
+                                        {
+                                            $next_page_url = $next_page_url.'&search='.$serachTerm;
+                                        }
+                                        if($directionBy != '' || $sortBy != '')
+                                        {
+                                            $next_page_url = $next_page_url.'&sort='.$sortBy.'&direction='.$directionBy;
+                                        }
+                                    ?>
+                                        <a class="btn next" href="<?php echo $next_page_url; ?>"> <i class="fa fa-arrow-right"></i> Next</a>
                                     <?php } ?>
                                 </div>
                             </div>
@@ -117,23 +183,33 @@
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <!-- <h5 class="modal-title alert alert-danger" id="staticModalLabel">Caution !!!
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <h5 class="modal-title">
+                            Upload or Drag File here
+                        </h5>
+                        <h5 class="modal-title alert alert-danger" id="errorTextH5" style="display: none;">
+                            <p id="errorText"></p>
+                            <button type="button" class="close close-test" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
-                        </h5> -->
+                        </h5>
+                        <h5 class="modal-title alert alert-success" id="successTextH5" style="display: none;">
+                            <p id="successText"></p>
+                            <button type="button" class="close close-succes" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </h5>
                     </div>
                     <div class="modal-body">
-                        <div class="dragcontainer">
+                        <div class="dragcontainer model-test">
                             <form name="fileUploadForm" id="fileUploadForm" action="javascript:void(0);" method="post" enctype="multipart/form-data">
                                 <input type="file" name="file" id="file">
 
                                 <!-- Drag and Drop container-->
                                 <div class="upload-area"  id="uploadfile">
-                                    <h1>Drag and Drop file here<br/>Or<br/>Click to select file</h1>
+                                    <h1>Drag and Drop file here Or Click to select file <span>(.CSV Format)</span></h1>
                                 </div>
 
-                                <button type="submit" onclick="uploadCsvFile();" name="fileUploadBtn" id="fileUploadBtn">UPLOAD</button>
+                                <button type="submit" onclick="uploadCsvFile();" name="fileUploadBtn" id="fileUploadBtn"><i id="fileLoader" class="fa fa-spinner" style="display: none" ></i> UPLOAD</button>
                             </form>
                         </div>
                     </div>
@@ -165,7 +241,7 @@
         $("html").on("dragover", function(e) {
             e.preventDefault();
             e.stopPropagation();
-            $("h1").text("Drag here");
+            $("h1").text("Drag your file here.");
         });
 
         $("html").on("drop", function(e) { e.preventDefault(); e.stopPropagation(); });
@@ -174,14 +250,14 @@
         $('.upload-area').on('dragenter', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $("h1").text("Drop");
+            $("h1").text("Drop your file here.");
         });
 
         // Drag over
         $('.upload-area').on('dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
-            $("h1").text("Drop");
+            $("h1").text("Drop your file here.");
         });
 
         // Drop
@@ -189,7 +265,7 @@
             e.stopPropagation();
             e.preventDefault();
 
-            $("h1").text("Upload");
+            $("h1").text("Click on the upload button.");
 
             var file = e.originalEvent.dataTransfer.files;
             var fd = new FormData();
@@ -214,6 +290,8 @@
             {
                 
             }*/
+            $("h1").text("Click on the upload button.");
+
             var fd = new FormData();
             var files = $('#file')[0].files[0];
 
@@ -224,6 +302,7 @@
 
     function uploadCsvFile()
     {
+        $("#fileLoader").fadeIn('slow');
         $.ajax({
             url: "{{url('admin/uploadcsv')}}",
             headers: {
@@ -235,7 +314,24 @@
             processData: false,
             //dataType: 'json',
             success: function(response){
-                console.log(response)
+                $("#fileLoader").fadeOut('slow');
+
+                var jsonData = $.parseJSON(response); 
+                var status = jsonData.status;
+                var message = jsonData.message;
+                if(status == 0)
+                {
+                    $("#errorText").html(message);
+                    $("#errorTextH5").fadeIn('slow');                    
+                }
+                else if(status == 1)
+                {
+                    $("#successText").html(message);
+                    $("#successTextH5").fadeIn('slow');
+                }
+                setTimeout(function(){ 
+                    location.reload();
+                }, 3000);
             }
         });
     }

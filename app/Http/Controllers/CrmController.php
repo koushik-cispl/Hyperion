@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Helpers;
+use Session;
 use App\CrmConfiguration;
 
 class CrmController extends Controller
@@ -15,6 +16,10 @@ class CrmController extends Controller
      */
     public function index()
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
         $crms =  CrmConfiguration::all();
         return view('crm.index',compact('crms'));
     }
@@ -26,8 +31,11 @@ class CrmController extends Controller
      */
     public function create()
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
         return view('crm.crm');
-
     }
 
     /**
@@ -38,6 +46,11 @@ class CrmController extends Controller
      */
     public function store(Request $request)
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
         $this->validate($request,[
             'crm_name' => 'required',
             'endpoint' => 'required',
@@ -95,6 +108,11 @@ class CrmController extends Controller
      */
     public function edit($id)
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
         $crm = CrmConfiguration::find($id);
         return view('crm.edit',compact('crm'));
     }
@@ -108,7 +126,12 @@ class CrmController extends Controller
      */
     public function update(Request $request, $id)
     {
-         $this->validate($request,[
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
+        $this->validate($request,[
             'crm_name' => 'required',
             'endpoint' => 'required',
             'crm_user' => 'required',
@@ -154,6 +177,11 @@ class CrmController extends Controller
      */
     public function destroy($id)
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+        
         $crm = CrmConfiguration::find($id);
         $crm->delete();
         return redirect()->back()->with('successMessage','CRM successfully deleted!');

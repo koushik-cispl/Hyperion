@@ -56,7 +56,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="row">
+                                            <!-- <div class="row">
                                                 <div class="col-6">
                                                     <div class="form-group">
                                                         <label for="email" class="control-label mb-1">Email</label>
@@ -79,56 +79,24 @@
                                                         @endif
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> -->
                                             <div class="form-group">
                                                 <label for="address" class="control-label mb-1">Address</label>
-                                                <textarea id="address" name="address" class="form-control @if ($errors->has('address')) is-invalid @endif">
-                                                    {{ old('address') }}
-                                                </textarea>
+                                                <textarea id="address" name="address" class="form-control @if ($errors->has('address')) is-invalid @endif">{{ old('address') }}</textarea>
                                                 @if ($errors->has('address'))
                                                     @foreach ($errors->get('address') as $error)
                                                         <span class="help-block formValidationError">{{ $error }}</span>
                                                     @endforeach
                                                 @endif
                                             </div>
-                                            <div class="row">
-                                                <div class="col-6">
-                                                    <div class="form-group">
-                                                        <label for="country" class="control-label">Country</label>
-                                                        <select name="country" id="country" class="form-control selectpicker @if ($errors->has('country')) is-invalid @endif" data-live-search="true" onchange="changeState($(this).val());">
-                                                            <option value="">Please select a country</option>
-                                                            @if(!empty($countryData))
-                                                                @foreach ($countryData as $country)
-                                                                    <option value="{{ $country['id'] }}" {{ (old("country") == $country['id'] ? "selected":"") }}>{{ $country['name'] }}</option>
-                                                                @endforeach
-                                                            @endif
-                                                        </select>
-                                                        @if ($errors->has('country'))
-                                                            @foreach ($errors->get('country') as $error)
-                                                                <span class="help-block formValidationError">{{ $error }}</span>
-                                                            @endforeach
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                <div class="col-6 loader">
-                                                    <div class="form-group">
-                                                        <label for="state" class="control-label">State</label>
-                                                        <i id="stateLoader" class="fa fa-spinner" style="display: none" ></i>
-                                                        <select name="state" id="state" class="form-control @if ($errors->has('state')) is-invalid @endif" data-live-search="true">
-                                                            <option value="">Please select a state</option>
-                                                            @if(!empty($stateData))
-                                                                @foreach ($stateData as $state)
-                                                                    <option value="{{ $state['id'] }}" {{ (old("state") == $state['id'] ? "selected":"") }}>{{ $state['name'] }}</option>
-                                                                @endforeach
-                                                            @endif
-                                                        </select>
-                                                        @if ($errors->has('state'))
-                                                            @foreach ($errors->get('state') as $error)
-                                                                <span class="help-block formValidationError">{{ $error }}</span>
-                                                            @endforeach
-                                                        @endif
-                                                    </div>
-                                                </div>
+                                            <div class="form-group">
+                                                <label for="address2" class="control-label mb-1">Address 2</label>
+                                                <textarea id="address2" name="address2" class="form-control @if ($errors->has('address2')) is-invalid @endif">{{ old('address2') }}</textarea>
+                                                @if ($errors->has('address2'))
+                                                    @foreach ($errors->get('address2') as $error)
+                                                        <span class="help-block formValidationError">{{ $error }}</span>
+                                                    @endforeach
+                                                @endif
                                             </div>
                                             <div class="row">
                                                 <div class="col-6">
@@ -144,10 +112,130 @@
                                                 </div>
                                                 <div class="col-6">
                                                     <div class="form-group">
+                                                        <label for="state" class="control-label mb-1">State</label>
+                                                        <input id="state" name="state" type="text" class="form-control @if ($errors->has('state')) is-invalid @endif" value="{{ old('state') }}">
+                                                        @if ($errors->has('state'))
+                                                            @foreach ($errors->get('state') as $error)
+                                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="form-group">
                                                         <label for="zip" class="control-label mb-1">Zip Code</label>
                                                         <input id="zip" name="zip" type="text" class="form-control @if ($errors->has('zip')) is-invalid @endif" value="{{ old('zip') }}">
                                                         @if ($errors->has('zip'))
                                                             @foreach ($errors->get('zip') as $error)
+                                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="plus4" class="control-label mb-1">Plus4</label>
+                                                        <input id="plus4" name="plus4" type="text" class="form-control @if ($errors->has('plus4')) is-invalid @endif" value="{{ old('plus4') }}">
+                                                        @if ($errors->has('plus4'))
+                                                            @foreach ($errors->get('plus4') as $error)
+                                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="deliveryP" class="control-label mb-1">DeliveryP</label>
+                                                        <input id="deliveryP" name="deliveryP" type="text" class="form-control @if ($errors->has('deliveryP')) is-invalid @endif" value="{{ old('deliveryP') }}">
+                                                        @if ($errors->has('deliveryP'))
+                                                            @foreach ($errors->get('deliveryP') as $error)
+                                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="crrt" class="control-label mb-1">CRRT</label>
+                                                        <input id="crrt" name="crrt" type="text" class="form-control @if ($errors->has('crrt')) is-invalid @endif" value="{{ old('crrt') }}">
+                                                        @if ($errors->has('crrt'))
+                                                            @foreach ($errors->get('crrt') as $error)
+                                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="check_digi" class="control-label mb-1">Check Digi</label>
+                                                        <input id="check_digi" name="check_digi" type="text" class="form-control @if ($errors->has('check_digi')) is-invalid @endif" value="{{ old('check_digi') }}">
+                                                        @if ($errors->has('check_digi'))
+                                                            @foreach ($errors->get('check_digi') as $error)
+                                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="return_cod" class="control-label mb-1">Return COD</label>
+                                                        <input id="return_cod" name="return_cod" type="text" class="form-control @if ($errors->has('return_cod')) is-invalid @endif" value="{{ old('return_cod') }}">
+                                                        @if ($errors->has('return_cod'))
+                                                            @foreach ($errors->get('return_cod') as $error)
+                                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="dpv" class="control-label mb-1">DPV</label>
+                                                        <input id="dpv" name="dpv" type="text" class="form-control @if ($errors->has('dpv')) is-invalid @endif" value="{{ old('dpv') }}">
+                                                        @if ($errors->has('dpv'))
+                                                            @foreach ($errors->get('dpv') as $error)
+                                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="lot" class="control-label mb-1">Lot</label>
+                                                        <input id="lot" name="lot" type="text" class="form-control @if ($errors->has('lot')) is-invalid @endif" value="{{ old('lot') }}">
+                                                        @if ($errors->has('lot'))
+                                                            @foreach ($errors->get('lot') as $error)
+                                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="finder" class="control-label mb-1">Finder</label>
+                                                        <input id="finder" name="finder" type="text" class="form-control @if ($errors->has('finder')) is-invalid @endif" value="{{ old('finder') }}">
+                                                        @if ($errors->has('finder'))
+                                                            @foreach ($errors->get('finder') as $error)
+                                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-group">
+                                                        <label for="key" class="control-label mb-1">Key</label>
+                                                        <input id="key" name="key" type="text" class="form-control @if ($errors->has('key')) is-invalid @endif" value="{{ old('key') }}">
+                                                        @if ($errors->has('key'))
+                                                            @foreach ($errors->get('key') as $error)
                                                                 <span class="help-block formValidationError">{{ $error }}</span>
                                                             @endforeach
                                                         @endif
