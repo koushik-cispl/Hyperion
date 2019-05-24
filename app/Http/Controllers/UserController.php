@@ -30,12 +30,22 @@ class UserController extends Controller
 
     public function newUser()
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
     	$roleData = Role::select('id','name')->where(array('status'=> 1))->get()->toArray();
     	return view('users/new-user',compact('roleData'));
     }
 
     public function newUserCreate(Request $request)
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
     	$validatedData = $request->validate([
     		'name' => 'required',
             'email' => 'required|email|unique:admin_users,email',
@@ -76,6 +86,11 @@ class UserController extends Controller
 
     public function editUser(Request $request, $id)
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
         $userDetails = AdminUser::select('id','name','email','mobile','role_id','status','avatar')->where(array('id'=> $id))->first()->toArray();
         $roleData = Role::select('id','name')->where(array('status'=> 1))->get()->toArray();
 
@@ -84,6 +99,11 @@ class UserController extends Controller
 
     public function editUserUpdate(Request $request)
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
         $userId = $request->input('userId');
 
         $validatedData = $request->validate([
@@ -141,6 +161,11 @@ class UserController extends Controller
 
     public function viewUser(Request $request, $id)
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
         $userDetails = AdminUser::with('userRoles')->select('name','email','mobile','avatar','role_id','status')->where(array('id'=> $id))->first()->toArray();
         //print_r($userDetails);die;
         return view('users/view-user',compact('userDetails'));
@@ -148,6 +173,11 @@ class UserController extends Controller
 
     public function deleteUser(Request $request)
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+        
         $userId = $request->input('uId');
 
         DB::table('admin_users')->where('id', $userId)->delete();

@@ -28,6 +28,11 @@ class LoginController extends Controller
 
     public function loginSubmit(Request $request)
     {
+        if(Session::get('userArray'))
+        {
+            return redirect('/admin/dashboard');
+        }
+        
         $validatedData = $request->validate([
             'email' => 'required|email',
             'password' => 'required',

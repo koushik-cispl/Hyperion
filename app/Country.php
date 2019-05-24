@@ -8,8 +8,8 @@ class Country extends Model
 {
     Protected $guarded = [];
 
-    function prospectsC()
+    /*function prospectsC()
     {
         return $this->hasMany('App\Prospect', 'id');
-    }
+    }*/
 }

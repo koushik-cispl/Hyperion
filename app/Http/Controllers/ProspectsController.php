@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use App\Role;
 use App\AdminUser;
 use App\Prospect;
+use App\UploadedCsv;
 use App\Country;
 use App\State;
 
@@ -31,7 +32,7 @@ class ProspectsController extends Controller
             return redirect('/admin/login');
         }
         
-        $allProspects = Prospect::with('prospectsCountry','prospectsState')->select('id','fname','lname','email','mobile','address','country','state','created_at')->simplePaginate(10)->toArray();
+        $allProspects = Prospect::sortable()->select('id','fname','lname','address','state','city','zip_code','created_at')->orderBy('id', 'DESC')->simplePaginate(50)->toArray();
         //print_r($allProspects);die;
         return view('prospects/index',compact('allProspects'));
     }
@@ -42,11 +43,8 @@ class ProspectsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-        $countryData = Country::all()->toArray();
-        $stateData = State::all()->toArray();
-        
-        return view('prospects/create',compact('countryData','stateData'));
+    {        
+        return view('prospects/create');
     }
 
     /**
@@ -57,28 +55,51 @@ class ProspectsController extends Controller
      */
     public function store(Request $request)
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
         $validatedData = $request->validate([
             'fname' => 'required',
             'lname' => 'required',
-            'email' => 'required|email|unique:prospects,email',
-            'mobile' => 'required',
+            /*'email' => 'required|email|unique:prospects,email',
+            'mobile' => 'required',*/
             'address' => 'required',
-            'country' => 'required',
-            'state' => 'required',
+            'address2' => '',
             'city' => 'required',
-            'zip' => 'required'
+            'state' => 'required',
+            'zip' => 'required',
+            'plus4' => '',
+            'deliveryP' => '',
+            'crrt' => '',
+            'check_digi' => '',
+            'return_cod' => '',
+            'dpv' => '',
+            'lot' => '',
+            'finder' => '',
+            'p_key' => ''
         ]);
 
         $insertData = array(
-            'fname' => $validatedData['fname'],
-            'lname' => $validatedData['lname'],
-            'email' => $validatedData['email'],
-            'mobile' => $validatedData['mobile'],
-            'address' => $validatedData['address'],
-            'country' => $validatedData['country'],
-            'state' => $validatedData['state'],
-            'city' => $validatedData['city'],
-            'zip_code' => $validatedData['zip'],
+            'fname' => $request->input('fname'),
+            'lname' => $request->input('lname'),
+            /*'email' => $request->input('email'),
+            'mobile' => $request->input('mobile'),*/
+            'address' => $request->input('address'),
+            'address2' => $request->input('address2'),
+            'city' => $request->input('city'),
+            'state' => $request->input('state'),
+            'zip_code' => $request->input('zip'),
+            'plus4' => $request->input('plus4'),
+            'delivery_p' => $request->input('deliveryP'),
+            'crrt' => $request->input('crrt'),
+            'check_digi' => $request->input('check_digi'),
+            'return_cod' => $request->input('return_cod'),
+            'dpv' => $request->input('dpv'),
+            'lot' => $request->input('lot'),
+            'finder' => $request->input('finder'),
+            'p_key' => $request->input('key'),
             'status' => 1,
             'order_place_status' => 0,
             'created_by' => Session::get('userArray')['userId']
@@ -98,7 +119,12 @@ class ProspectsController extends Controller
      */
     public function show($id)
     {
-        $prospectDetails = Prospect::with('prospectsCountry','prospectsState')->select('id','fname','lname','email','mobile','address','country','state','city','zip_code')->where(array('id'=> $id))->first()->toArray();
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
+        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','address2','state','city','zip_code','plus4','delivery_p','crrt','check_digi','return_cod','dpv','lot','finder','p_key')->where(array('id'=> $id))->first()->toArray();
         //print_r($prospectDetails);die;
         return view('prospects/view',compact('prospectDetails'));
     }
@@ -111,11 +137,14 @@ class ProspectsController extends Controller
      */
     public function edit($id)
     {
-        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','country','state','city','zip_code')->where(array('id'=> $id))->first()->toArray();
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
 
-        $countryData = Country::all()->toArray();
-        $stateData = State::select('id','name')->where(array('country_id'=> $prospectDetails['country']))->get()->toArray();
-        return view('prospects/edit',compact('prospectDetails','countryData','stateData'));
+        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','address2','state','city','zip_code','plus4','delivery_p','crrt','check_digi','return_cod','dpv','lot','finder','p_key')->where(array('id'=> $id))->first()->toArray();
+
+        return view('prospects/edit',compact('prospectDetails'));
     }
 
     /**
@@ -127,28 +156,53 @@ class ProspectsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
         $validatedData = $request->validate([
             'fname' => 'required',
             'lname' => 'required',
-            'email' => 'required|email|unique:prospects,email,'.$id,
-            'mobile' => 'required',
+            /*'email' => 'required|email|unique:prospects,email',
+            'mobile' => 'required',*/
             'address' => 'required',
-            'country' => 'required',
-            'state' => 'required',
+            'address2' => '',
             'city' => 'required',
-            'zip' => 'required'
+            'state' => 'required',
+            'zip' => 'required',
+            'plus4' => '',
+            'deliveryP' => '',
+            'crrt' => '',
+            'check_digi' => '',
+            'return_cod' => '',
+            'dpv' => '',
+            'lot' => '',
+            'finder' => '',
+            'p_key' => ''
         ]);
 
         $updateData = array(
-            'fname' => $validatedData['fname'],
-            'lname' => $validatedData['lname'],
-            'email' => $validatedData['email'],
-            'mobile' => $validatedData['mobile'],
-            'address' => $validatedData['address'],
-            'country' => $validatedData['country'],
-            'state' => $validatedData['state'],
-            'city' => $validatedData['city'],
-            'zip_code' => $validatedData['zip'],
+            'fname' => $request->input('fname'),
+            'lname' => $request->input('lname'),
+            /*'email' => $request->input('email'),
+            'mobile' => $request->input('mobile'),*/
+            'address' => $request->input('address'),
+            'address2' => $request->input('address2'),
+            'city' => $request->input('city'),
+            'state' => $request->input('state'),
+            'zip_code' => $request->input('zip'),
+            'plus4' => $request->input('plus4'),
+            'delivery_p' => $request->input('deliveryP'),
+            'crrt' => $request->input('crrt'),
+            'check_digi' => $request->input('check_digi'),
+            'return_cod' => $request->input('return_cod'),
+            'dpv' => $request->input('dpv'),
+            'lot' => $request->input('lot'),
+            'finder' => $request->input('finder'),
+            'p_key' => $request->input('key'),
+            'status' => 1,
+            'order_place_status' => 0,
             'created_by' => Session::get('userArray')['userId'],
             'updated_at' => Carbon::now()->toDateTimeString()
         );
@@ -199,13 +253,129 @@ class ProspectsController extends Controller
 
     public function uploadcsv(Request $request)
     {
-        print_r($_FILES);die;
-        /* Getting file name */
-        $filename = $_FILES['file']['name'];
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
 
-        /* Getting File size */
-        $filesize = $_FILES['file']['size'];
+        if ($request->hasFile('file'))
+        {
+            $file = $request->file('file');
+            // File Details 
+            $filename = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            $tempPath = $file->getRealPath();
+            $fileSize = $file->getSize();
+            $mimeType = $file->getMimeType();
 
-        echo $filename;die;
+            // Valid File Extensions
+            $valid_extension = array("csv");
+
+            // Check file extension
+            if(in_array(strtolower($extension),$valid_extension))
+            {
+                // File upload location
+                $location = 'csv_uploads';
+
+                $filename = preg_replace('/\..+$/', '', $file->getClientOriginalName());
+                $fullFilename = $filename.time().'.'.$file->getClientOriginalExtension();
+
+                // Upload file
+                $file->move($location,$fullFilename);
+
+                // Import CSV to Database
+                $filepath = public_path($location."/".$fullFilename);
+
+                // Reading file
+                $file = fopen($filepath,"r");
+
+                $importData_arr = array();
+                $i = 0;
+
+                while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+                    
+                    $num = count($filedata );
+
+                    // Skip first row (Remove below comment if you want to skip the first row)
+                    if($i == 0){
+                        $i++;
+                        continue; 
+                    }
+                    for ($c=0; $c < $num; $c++) {
+                        $importData_arr[$i][] = $filedata [$c];
+                    }
+                    $i++;
+                }
+                fclose($file);
+
+                //print_r($importData_arr);die;
+                // Insert to MySQL database
+                foreach($importData_arr as $key => $importData)
+                {
+                    //$parts = preg_split('/[\t]/', $importData[0]);
+                    $insertData = array(
+                        "fname" => $importData[0],
+                        "lname" => $importData[1],
+                        "p_key" => $importData[3],
+                        "address" => $importData[4],
+                        "address2" => $importData[5],
+                        "city" => $importData[6],
+                        "state" => $importData[7],
+                        "zip_code" => $importData[8],
+                        "plus4" => $importData[9],
+                        "delivery_p" => $importData[10],
+                        "crrt" => $importData[11],
+                        "check_digi" => $importData[12],
+                        "return_cod" => $importData[13],
+                        "dpv" => $importData[14],
+                        "lot" => $importData[15],
+                        "finder" => $importData[16],
+                        "status" => 1,
+                        "order_place_status" => 0,
+                        "created_by" => Session::get('userArray')['userId']
+                    );
+                    //print_r($insertData);
+                    Prospect::create($insertData);
+                }
+
+                $csvData = array(
+                    'uploaded_by' => Session::get('userArray')['userId'],
+                    'file_name' => $fullFilename,
+                );
+
+                UploadedCsv::create($csvData);
+
+                $message = "file uploaded.";
+                $status = 1;
+            }
+            else
+            {
+                $message = "Invalid File Extension.";
+                $status = 0;
+            }
+        }
+        else
+        {
+            $message = "file not uploaded.";
+            $status = 0;
+        }
+        $jsonArray = json_encode(array('message' => $message, 'status' => $status));
+        echo $jsonArray;
+        exit;
+    }
+
+    public function searchProspect(Request $request)
+    {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+        
+        $serachTerm = $_GET['search'];
+
+        $allProspects = Prospect::where('fname', 'LIKE', '%' . $serachTerm . '%')->orWhere('lname', 'LIKE', '%' . $serachTerm . '%')->orderBy('id', 'DESC')->simplePaginate(50)->toArray();
+        //$allProspects->appends(['search' => $serachTerm]);
+        //print_r($allProspects);die;
+        return view('prospects/index',compact('allProspects'));
     }
 }
