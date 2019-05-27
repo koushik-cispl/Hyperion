@@ -2,6 +2,10 @@
 <html class="no-js" lang="">
 
 <?php
+$userRole = \Helpers::checkRolePermissions();
+?>
+
+<?php
 if(isset($_GET['search']))
 {
     $serachTerm = $_GET['search'];
@@ -102,6 +106,9 @@ else
                                             <th>@sortablelink('state')</th>
                                             <th>@sortablelink('city')</th>
                                             <th>Zip Code</th>
+                                            <?php if($userRole == 1) { ?>
+                                            <th>Created By</th>
+                                            <?php } ?>
                                             <th>@sortablelink('created_at', 'Created At')</th>
                                             <th>Action</th>
                                         </tr>
@@ -116,6 +123,9 @@ else
                                                     <td>{{ $prospects['state'] }}</td>
                                                     <td>{{ $prospects['city'] }}</td>
                                                     <td>{{ $prospects['zip_code'] }}</td>
+                                                    <?php if($userRole == 1) { ?>
+                                                    <td>{{ $prospects['prospect_created_user']['name'] }}</td>
+                                                    <?php } ?>
                                                     <td>{{ $prospects['created_at'] }}</td>
                                                     <td>
                                                         <a class="btn btn-primary userListingAction" href="{{route('prospects.edit',$prospects['id'])}}" role="button" title="Edit Prospect">

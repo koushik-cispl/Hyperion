@@ -36,7 +36,7 @@
 
         <div class="content">
             @include('common/message-show')
-            <div class="animated fadeIn">
+            <div class="animated fadeIn listingCls">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="card">
