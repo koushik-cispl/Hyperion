@@ -127,7 +127,7 @@ else
                                                     <td>{{ $prospects['prospect_created_user']['name'] }}</td>
                                                     <?php } ?>
                                                     <td>{{ $prospects['created_at'] }}</td>
-                                                    <td>
+                                                    <td class="action_icon_td">
                                                         <a class="btn btn-primary userListingAction" href="{{route('prospects.edit',$prospects['id'])}}" role="button" title="Edit Prospect">
                                                             <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                                         </a>

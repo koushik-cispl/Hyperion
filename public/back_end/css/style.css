@@ -2702,3 +2702,18 @@ label{font-size: 14px;}
 .icon-down{
   font-size: 24px;
 }
+.action_icon_td{
+  padding: 2px !important;
+    text-align: center !important;
+}
+.userListingAction {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    padding: 2px;
+    float: left;
+}
+.userListingAction:nth-child(2) {
+    margin: 0 2px;
+}
+.userListingAction i.fa{font-size: 14px;}
