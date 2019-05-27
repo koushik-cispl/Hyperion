@@ -12,4 +12,9 @@ class AdminUser extends Model
     {
         return $this->belongsTo('App\Role', 'role_id');
     }
+
+    function prospects()
+    {
+        return $this->hasMany('App\Prospect', 'id');
+    }
 }
