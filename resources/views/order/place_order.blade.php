@@ -24,43 +24,20 @@
                         <i class="mr-2 fa fa-align-justify"></i>
                         <strong class="card-title" v-if="headerText">Place Order</strong>
                     </div>
-                    <div class="card-body">
-                      <button type="button" class="btn btn-secondary mb-1" data-toggle="modal" data-target="#mediumModal">
-                          Medium
-                      </button>
-            
-                  </div>
               </div>
 
-            <div class="modal fade" id="mediumModal" tabindex="-1" role="dialog" aria-labelledby="mediumModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="mediumModalLabel">Medium Modal</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <p>
-                                There are three species of zebras: the plains zebra, the mountain zebra and the Grévy's zebra. The plains zebra
-                                and the mountain zebra belong to the subgenus Hippotigris, but Grévy's zebra is the sole species of subgenus
-                                Dolichohippus. The latter resembles an ass, to which it is closely related, while the former two are more
-                                horse-like. All three belong to the genus Equus, along with other living equids.
-                            </p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary">Confirm</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          
      
         
         <!-- Place order form -->
-        <div class="row">
+        <form action="{{route('placeOrder')}}" method="POST" name="OrderForm" id="OrderForm" class="form-horizontal">
+            {{ csrf_field() }}
+            <div class="pop_loader" id="pop_loader">
+                                <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+                                </div>
+            <div class="row">
         <div class="col-lg-6">
+            <div class="loader" style="display:none;"></div>
             <div class="card">
                 <div class="card-header">
                     <strong>Campaign Information:</strong>
@@ -69,15 +46,21 @@
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="exampleInputName2" class="pr-1  form-control-label">Select Campaign:</label></div>
                         
-                            <div class="col-12 col-md-8"><select class="form-control" name="campaig_id" >
-                                <option>Select Campaign</option>
+                            <div class="col-12 col-md-8"><select class="form-control" onchange="ChangeCampaign($(this).val());" name="campaignId" id="campaignId" >
+                                <option value="">Select Campaign</option>
                                 <?php array_walk($campaign_id, function ($campaign_id,$key) use ($campaign_name) { 
                                 ?>
                                 <option value="<?php echo $campaign_id; ?>"><?php echo '('.$campaign_id.') '. $campaign_name[$key];  ?></option> 
                                 <?php
                                     });
                                     ?>
-                            </select></div>
+                            </select>
+                                     @if ($errors->has('campaignId'))
+                                        @foreach ($errors->get('campaignId') as $error)
+                                            <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
                         </div>
                     </div>
             </div>
@@ -86,194 +69,400 @@
                     <strong>Product Info:</strong>
                 </div>
                     <div class="card-body card-block">
+                        
+
                         <div class="row form-group">
-                          <div class="col col-md-3">  <label for="exampleInputName2" class="pr-1  form-control-label">Offer:</label></div>
-                           <div class="col-12 col-md-9"> 
-                               <select class="form-control" name="campaig_id">
-                                    <option>Select Offer:</option>
+                          <div class="col col-md-4">  <label for="exampleInputName2" class="pr-1  form-control-label">Offer:</label></div>
+                           <div class="col-12 col-md-8"> 
+                               <select class="form-control" name="offer_id" id="offer_id">
+                                    <option value="">Select Offer:</option>
                                 </select>
+                                 @if ($errors->has('offer_id'))
+                                        @foreach ($errors->get('offer_id') as $error)
+                                            <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
                            </div>
-                        </div>
-                        <div class="checkbox">
-                            <label for="exampleInputName2" class="pr-1  form-control-label">Trial?</label>
-                            <label for="checkbox" class="form-check-label ">
-                                <input type="checkbox" id="trialProduct" name="trial" value="" class="form-check-input">
-                            </label>
+                        </div>                        
+                        <div class="row form-group">
+                            <div class="col col-md-4"><label for="exampleInputName2" class="pr-1  form-control-label">Billing Model:</label></div>
+                            <div class="col-12 col-md-8"><select class="form-control" name="billing_model_id" id="billing_model_id">
+                                <option value="">Select Billing Model</option>
+                            </select>
+                                    @if ($errors->has('billing_model_id'))
+                                        @foreach ($errors->get('billing_model_id') as $error)
+                                            <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">Trial Product:</label></div>
-                            <div class="col-12 col-md-9"><select class="form-control" name="product">
-                                <option>Select product:</option>
-                            </select></div>
+                            <div class="col col-md-4"><label for="exampleInputName2" class="pr-1  form-control-label"> Product:</label></div>
+                            <div class="col-12 col-md-8"><select onchange="Changeproduct($(this).val());" class="form-control" name="product_id" id="product_id">
+                                <option value="">Select product</option>
+                            </select>
+                                    @if ($errors->has('product_id'))
+                                        @foreach ($errors->get('product_id') as $error)
+                                            <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                    </div>
                         </div>
                         <div class="row form-group">
-                           <div class="col col-md-3"> <label for="exampleInputName2" class="pr-1  form-control-label">Trial Price:</label></div>
-                           <div class="col-12 col-md-9"> <input type="text" id="trialPrice" name="trialPrice" class="form-control"></div>
+                           <div class="col col-md-4"> <label for="exampleInputName2" class="pr-1  form-control-label"> Price:</label></div>
+                           <div class="col-12 col-md-8"> <input type="text" id="ProductPrice" disabled="disabled" name="ProductPrice" class="form-control"></div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">Quantity:</label></div>
-                           <div class="col-12 col-md-9"> <input type="text" id="trialQuantity" name="trialQuantity" class="form-control"></div>
+                            <div class="col col-md-4"><label for="exampleInputName2" class="pr-1  form-control-label">Quantity:</label></div>
+                           <div class="col-12 col-md-8"> <input type="text" id="quantity" onkeyup="QtyChange(this.value);" name="quantity" class="form-control"></div>
+                        </div>
+                        <div>
+                        <div class="row form-group">
+                            <div class="col col-md-4"><label for="exampleInputName2" class="pr-1  form-control-label"> Shipping Method:</label></div>
+                            <div class="col-12 col-md-6"><select onchange="ChangeShipping($(this).val());" class="form-control" name="shippingId" id="shippingId">
+                                <option>Select Shipping</option>
+                            </select>
+                            </div><span>$<span class="ship_price line-height34">0.00</span></span>
                         </div>
                     </div>
+                    </div>
+                    
             </div>
             <div class="card">
                 <div class="card-header">
                                 <strong>Shipping / Billing Information:</strong>
                 </div>
                 <div class="card-body card-block">
-                    <form action="#" method="post" enctype="multipart/form-data" class="form-horizontal">
+                    
                     <div class="row form-group">
-                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Shipping First Name:</label></div>
-                                        <div class="col-12 col-md-9"><input type="text" id="ShippingFirstName" name="ShippingFirstName" class="form-control"><small class="form-text text-muted">This is a help text</small></div>
-                        </div>
-                                    <div class="row form-group">
-                                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Shipping Last Name:</label></div>
-                                        <div class="col-12 col-md-9"><input type="text" id="ShippingLastName" name="ShippingLastName" class="form-control"><small class="form-text text-muted">This is a help text</small></div>
-                                    </div>
-                                    <div class="row form-group">
-                                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Shipping Address:</label></div>
-                                        <div class="col-12 col-md-9"><input type="text" id="ShippingAddress" name="ShippingAddress" class="form-control"><small class="form-text text-muted">This is a help text</small></div>
-                                    </div>
-                                    <div class="row form-group">
-                                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Shipping Address2:</label></div>
-                                        <div class="col-12 col-md-9"><input type="text" id="ShippingAddress2" name="ShippingAddress2" class="form-control"><small class="form-text text-muted">This is a help text</small></div>
-                                    </div>
-                                    <div class="row form-group">
-                                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Shipping City:</label></div>
-                                        <div class="col-12 col-md-9"><input type="text" id="ShippingCity" name="ShippingCity" class="form-control"><small class="form-text text-muted">This is a help text</small></div>
-                                    </div>
-                                    <div class="row form-group">
-                                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Shipping Zip Code:</label></div>
-                                        <div class="col-12 col-md-9"><input type="tel" id="ShippingZipCode" name="ShippingZipCode" class="form-control"><small class="form-text text-muted">This is a help text</small></div>
-                                    </div>
-                        <div class="row form-group">
-                                        <div class="col col-md-3"><label for="select" class=" form-control-label">Shipping Country:</label></div>
-                                        <div class="col-12 col-md-9">
-                                            <select name="select" id="select" class="form-control">
-                                                <option value="0">select Country</option>
-                                                <option value="1">Option #1</option>
-                                                <option value="2">Option #2</option>
-                                                <option value="3">Option #3</option>
-                                            </select>
-                                        </div>
+                        <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping First Name:</label></div>
+                            <div class="col-12 col-md-8">
+                                <input type="text" id="ShippingFirstName" value="" name="ShippingFirstName" class="form-control">
+                                    @if ($errors->has('ShippingFirstName'))
+                                        @foreach ($errors->get('ShippingFirstName') as $error)
+                                        <span class="help-block formValidationError">{{ $error }}</span>
+                                    @endforeach
+                                @endif
+                             </div>
                         </div>
                         <div class="row form-group">
-                                        <div class="col col-md-3"><label for="select" class=" form-control-label">Shipping State:</label></div>
-                                        <div class="col-12 col-md-9">
-                                            <select name="select" id="select" class="form-control">
-                                                <option value="0">select State</option>
-                                                <option value="1">Option #1</option>
-                                                <option value="2">Option #2</option>
-                                                <option value="3">Option #3</option>
-                                            </select>
-                                        </div>
+                            <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping Last Name:</label></div>
+                            <div class="col-12 col-md-8"><input type="text" id="ShippingLastName" name="ShippingLastName" class="form-control">
+                                @if ($errors->has('ShippingLastName'))
+                                    @foreach ($errors->get('ShippingLastName') as $error)
+                                        <span class="help-block formValidationError">{{ $error }}</span>
+                                    @endforeach
+                                @endif
+                            </div>
                         </div>
-                                    <div class="row form-group">
-                                        <div class="col col-md-3"><label for="text-input" class=" form-control-label">Phone:</label></div>
-                                        <div class="col-12 col-md-9"><input type="tel" id="Phone" name="Phone" class="form-control"><small class="form-text text-muted">This is a help text</small></div>
-                                    </div>
-                                    <div class="row form-group">
-                                        <div class="col col-md-3"><label for="email-input" class=" form-control-label">Email</label></div>
-                                        <div class="col-12 col-md-9"><input type="email" id="Email" name="Email" class="form-control"><small class="help-block form-text">Please enter your email</small></div>
-                                    </div>
                         <div class="row form-group">
-                                        <div class="col col-md-10"><label class=" form-control-label">Is your billing address the same as this shipping address?</label></div>
-                                        <div class="col col-md-2">
-                                            <div class="form-check-inline form-check">
-                                                <label for="inline-radio1" class="form-check-label ">
-                                                    <input type="radio" id="inline-radio1" name="BillasShipp" value="yes" class="form-check-input">Yes
-                                                </label>
-                                                <label for="inline-radio2" class="form-check-label ">
-                                                    <input type="radio" id="inline-radio2" name="BillasShipp" value="no" class="form-check-input">No
-                                                </label>
-                                            </div>
-                                        </div>
+                            <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping Address:</label></div>
+                            <div class="col-12 col-md-8"><input type="text" id="ShippingAddress" name="ShippingAddress" class="form-control">
+                            @if ($errors->has('ShippingAddress'))
+                                        @foreach ($errors->get('ShippingAddress') as $error)
+                                            <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
                         </div>
-                    </form>
+                        <div class="row form-group">
+                            <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping Address2:</label></div>
+                            <div class="col-12 col-md-8"><input type="text" id="ShippingAddress2" name="ShippingAddress2" class="form-control"></div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping City:</label></div>
+                            <div class="col-12 col-md-8"><input type="text" id="ShippingCity" name="ShippingCity" class="form-control">
+                            @if ($errors->has('ShippingCity'))
+                                        @foreach ($errors->get('ShippingCity') as $error)
+                                            <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping Zip Code:</label></div>
+                            <div class="col-12 col-md-8"><input type="tel" id="ShippingZipCode" name="ShippingZipCode" class="form-control">
+                            @if ($errors->has('ShippingZipCode'))
+                                        @foreach ($errors->get('ShippingZipCode') as $error)
+                                            <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-4"><label for="select" class=" form-control-label">Shipping Country:</label></div>
+                            <div class="col-12 col-md-8">
+                                <select name="ShippingCountry" id="ShippingCountry" class="form-control">
+                                    <option value="US">US</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-4"><label for="select" class=" form-control-label">Shipping State:</label></div>
+                            <div class="col-12 col-md-8">
+                                <select name="ShippingState" id="ShippingState" class="form-control">
+                                    {!! \Helpers::get_states(); !!}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-4"><label for="text-input" class=" form-control-label">Phone:</label></div>
+                            <div class="col-12 col-md-8"><input type="tel" id="Phone" name="Phone" class="form-control">
+                            @if ($errors->has('Phone'))
+                                        @foreach ($errors->get('Phone') as $error)
+                                            <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-4"><label for="email-input" class=" form-control-label">Email</label></div>
+                            <div class="col-12 col-md-8"><input type="email" id="Email" name="Email" class="form-control">
+                            @if ($errors->has('Email'))
+                                        @foreach ($errors->get('Email') as $error)
+                                            <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-8"><label class=" form-control-label">Is your billing address the same as this shipping address?</label></div>
+                            <div class="col col-md-4">
+                                <div class="form-check-inline form-check">
+                                    <label for="inline-radio1" class="form-check-label margin-right10">
+                                        <input type="radio" id="inline-radio1" name="BillasShipp" @if (!$errors->has('BillingFirstName'))  checked="checked" @endif onchange="BillSameAsShip(this.value);" value="yes" class="form-check-input">Yes
+                                    </label>
+                                    <label for="inline-radio2" class="form-check-label ">
+                                        <input type="radio" id="inline-radio2" name="BillasShipp" onchange="BillSameAsShip(this.value);" value="no" @if ($errors->has('BillingFirstName'))  checked="checked" @endif class="form-check-input">No
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="BillingSameAsShipping" @if (!$errors->has('BillingFirstName')) style="display:none;" @endif>
+                            <div class="row form-group">
+                            <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing First Name:</label></div>
+                                <div class="col-12 col-md-8">
+                                    <input type="text" id="BillingFirstName" value="" name="BillingFirstName" class="form-control">
+                                        @if ($errors->has('BillingFirstName'))
+                                            @foreach ($errors->get('BillingFirstName') as $error)
+                                            <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing Last Name:</label></div>
+                                <div class="col-12 col-md-8"><input type="text" id="BillingLastName" name="BillingLastName" class="form-control">
+                                    @if ($errors->has('BillingLastName'))
+                                        @foreach ($errors->get('BillingLastName') as $error)
+                                            <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing Address:</label></div>
+                                <div class="col-12 col-md-8"><input type="text" id="BillingAddress" name="BillingAddress" class="form-control">
+                                @if ($errors->has('BillingAddress'))
+                                            @foreach ($errors->get('BillingAddress') as $error)
+                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                            @endforeach
+                                        @endif
+                                    </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing Address2:</label></div>
+                                <div class="col-12 col-md-8"><input type="text" id="BillingAddress2" name="BillingAddress2" class="form-control"></div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing City:</label></div>
+                                <div class="col-12 col-md-8"><input type="text" id="BillingCity" name="BillingCity" class="form-control">
+                                @if ($errors->has('BillingCity'))
+                                            @foreach ($errors->get('BillingCity') as $error)
+                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                            @endforeach
+                                        @endif
+                                    </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing Zip Code:</label></div>
+                                <div class="col-12 col-md-8"><input type="tel" id="BillingZipCode" name="BillingZipCode" class="form-control">
+                                    @if ($errors->has('BillingZipCode'))
+                                            @foreach ($errors->get('BillingZipCode') as $error)
+                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                            @endforeach
+                                        @endif
+                                    </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col col-md-4"><label for="select" class=" form-control-label">Billing Country:</label></div>
+                                <div class="col-12 col-md-8">
+                                    <select name="BillingCountry" id="BillingCountry" class="form-control">
+                                        <option value="US">US</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col col-md-4"><label for="select" class=" form-control-label">Billing State:</label></div>
+                                <div class="col-12 col-md-8">
+                                    <select name="BillingState" id="BillingState" class="form-control">
+                                         {!! \Helpers::get_states(); !!}
+                                    </select>
+                                    @if ($errors->has('BillingState'))
+                                            @foreach ($errors->get('BillingState') as $error)
+                                                <span class="help-block formValidationError">{{ $error }}</span>
+                                            @endforeach
+                                        @endif
+                                </div>
+                            </div>
+                        </div>
+                        
+                    
                 </div>
             </div>
             <div class="card">
-                <div class="card-header">
+                <div class="card-header" id="affiliate_wrap">
                     <strong>Affiliate / Sub Affiliate:</strong>
+                    <i class="fa fa-angle-down pull-right icon-down" aria-hidden="true"></i>
                 </div>
-                    <div class="card-body card-block">
+                    <div class="card-body affiliate-block affiliate_wrap">
                         <div class="row form-group">
-                          
+                            <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">AFID:</label></div>
+                           <div class="col-12 col-md-3"> <input type="text" name="AFID" class="form-control"></div>
+                        <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">SID:</label></div>
+                           <div class="col-12 col-md-3"> <input type="text" name="SID" class="form-control"></div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">AFFID:</label></div>
+                           <div class="col-12 col-md-3"> <input type="text" name="AFFID" class="form-control"></div>
+                        <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">C1:</label></div>
+                           <div class="col-12 col-md-3"> <input type="text" name="C1" class="form-control"></div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">C2:</label></div>
+                           <div class="col-12 col-md-3"> <input type="text" name="C2" class="form-control"></div>
+                        <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">C3:</label></div>
+                           <div class="col-12 col-md-3"> <input type="text"  name="C3" class="form-control"></div>
+                        </div>
+                        <div class="row form-group">
+                           <div class="col col-md-3"> <label for="exampleInputName2" class="pr-1  form-control-label"> Notes:</label></div>
+                           <div class="col-12 col-md-9"> 
+                               <textarea name="notes" class="form-control"></textarea></div>
                         </div>
                     </div>
             </div>
             
         </div>
         <div class="col-lg-6">
-                        <div class="card">
+            <div class="card">
                             <div class="card-header">
                                 <strong class="card-title">Order Summary:</strong>
                             </div>
                             <div class="table-stats order-table ov-h">
+                                
                                 <table class="table ">
                                     <thead>
                                         <tr>
-                                            <th class="avatar">Product</th>
-                                            <th>Base</th>
-                                            <th>Qty</th>
-                                            <th>Total</th>
+                                            <th class="avatar"><strong>Product</strong></th>
+                                            <th><strong>Base</strong></th>
+                                            <th><strong>Qty</strong></th>
+                                            <th><strong>Total</strong></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td> #5469 </td>
-                                            <td>  <span class="name">Louis Stanley</span> </td>
-                                            <td> <span class="product">iMax</span> </td>
-                                            <td><span class="count">231</span></td>
+                                        <tr class="product_details">
+                                            <td><span id="pname"></span> </td>
+                                            <td> $<span class="name baseprice" id="baseprice">0.00</span> </td>
+                                            <td> <span class="product" id="qty"></span> </td>
+                                            <td>$<span class="sub_total" >0.00</span></td>
                                         </tr>
                                         <tr>
-                                           
-                                            <td> #5468 </td>
-                                            <td>  <span class="name">Gregory Dixon</span> </td>
-                                            <td> <span class="product">iPad</span> </td>
-                                            <td><span class="count">250</span></td>
-                                            
+                                            <td></td><td></td>
+                                            <td> <span class="product">Sub Total:</span> </td>
+                                            <td>$<span class=" sub_total">0.00</span></td>
+                                            </tr>
+                                        <tr><td> </td><td></td>
+                                            <td> <span class="product">Shipping:</span> </td>
+                                            <td>$<span class="ship_price">0.00</span></td>
                                         </tr>
-                                        
+                                         <tr><td><strong>Grand Total:</strong> </td><td></td>
+                                            <td>  </td>
+                                            <td><strong>$<span class="totalPrice" id="totalPrice">0.00</span></strong></td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div> <!-- /.table-stats -->
                         </div>
-                        <div class="card">
+            <div class="card">
                 <div class="card-header">
                     <strong>Payment Information:</strong>
                 </div>
                     <div class="card-body card-block">
                         <div class="row form-group">
-                          <div class="col col-md-3"><label for="select" class=" form-control-label">Payment Type:</label></div>
-                                <div class="col-12 col-md-9">
-                                <select name="select" id="select" class="form-control">
-                                    <option>Card Type</option>
+                          <div class="col col-md-4"><label for="select" class=" form-control-label">Payment Type:</label></div>
+                                <div class="col-12 col-md-8">
+                                <select name="CardType" id="cc_type_n" class="form-control select-fld">
+                                    <option value="">Card Type</option>
                                     <option value="visa">Visa</option>
-                                    <option value="masterCard">Master Card</option>
+                                    <option value="master">Master Card</option>
+                                    <option value="discover">Discover</option>
                                 </select>
+                                @if ($errors->has('CardType'))
+                                     @foreach ($errors->get('CardType') as $error)
+                                        <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
                             </div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="text-input" class=" form-control-label">Credit Card Number:</label></div>
-                            <div class="col-12 col-md-9"><input type="tel" id="CreditCard" name="CreditCard" class="form-control"><small class="form-text text-muted">This is a help text</small></div>
+                            <div class="col col-md-4"><label for="text-input" class=" form-control-label">Credit Card Number:</label></div>
+                            <div class="col-12 col-md-8"><input type="tel" maxlength="16" id="CreditCard" name="CreditCard" class="form-control" onkeyup="javascript:this.value=this.value.replace(/[^0-9]/g,'');">
+                            @if ($errors->has('CreditCard'))
+                                     @foreach ($errors->get('CreditCard') as $error)
+                                        <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
                         </div>
                         <div class="row form-group">
-                          <div class="col col-md-3"><label for="select" class=" form-control-label">Expiration Date:</label></div>
-                                <div class="col-12 col-md-9">
+                          <div class="col col-md-4"><label for="select" class=" form-control-label">Expiration Date:</label></div>
+                                <div class="col-12 col-md-8">
+                                    <div class="row">
+                                    <div class="col-12 col-md-6">
                                 <select name="ExpMonth" id="ExpMonth" class="form-control">
-                                    <option value="0">Month</option>
+                                   {!! \Helpers::get_months(); !!}
                                 </select>
+                                @if ($errors->has('ExpMonth'))
+                                     @foreach ($errors->get('ExpMonth') as $error)
+                                        <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                    </div>
+                                    <div class="col-12 col-md-6">
                                  <select name="ExpYear" id="ExpYear" class="form-control">
-                                    <option value="0">year</option>
+                                    {!! \Helpers::get_years(); !!}
                                 </select>
+                                @if ($errors->has('ExpYear'))
+                                     @foreach ($errors->get('ExpYear') as $error)
+                                        <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                    </div>
+                                    </div>
                             </div>
                         </div>
                         <div class="row form-group">
-                            <div class="col col-md-3"><label for="text-input" class=" form-control-label">CVV:</label></div>
-                            <div class="col-12 col-md-9"><input type="tel" id="Cvv" name="Cvv" class="form-control"><small class="form-text text-muted">This is a help text</small></div>
+                            <div class="col col-md-4"><label for="text-input" class=" form-control-label">CVV:</label></div>
+                            <div class="col-12 col-md-8"><input type="tel" id="Cvv" maxlength="4" name="Cvv" class="form-control">
+                            @if ($errors->has('Cvv'))
+                                     @foreach ($errors->get('Cvv') as $error)
+                                        <span class="help-block formValidationError">{{ $error }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-sm">
+                        <button type="submit" class="btn btn-success btn-sm">
                                      Process Order
                                 </button>
                     </div>
@@ -281,10 +470,11 @@
         </div>
         
         </div>
+        </form>
         </div>
         
     </div><!-- .content -->
-    
+
 
     <div class="clearfix"></div>
 
@@ -296,5 +486,129 @@
 
 @include('common/scripts')
 
+<script type="text/javascript">
+
+    function ChangeCampaign(campaign){
+        
+        $('.pop_loader').show();
+         $.ajax({
+            type: 'POST',
+            url: "{{route('campaignchange')}}",
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: 'campaign=' + campaign,
+            dataType: "json",
+            success: function(res) {
+                $('.pop_loader').hide();
+                $("#offer_id").html(res.offer_ids);
+                $("#product_id").html(res.product_ids);
+                $("#billing_model_id").html(res.billing_model_ids);
+                $("#quantity").val('1');
+                $("#shippingId").html(res.shipping_ids);
+                $(".ship_price").html(res.ship_price);
+                $("#totalPrice").html(res.ship_price);
+            }
+        });
+	}
+
+     function Changeproduct(product){
+        $('.pop_loader').show();
+        var ship_price = parseFloat($(".ship_price").html()); 
+         $.ajax({
+            type: 'POST',
+            url: "{{route('productchange')}}",
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: 'product=' + product,
+            dataType: "json",
+            success: function(res) {
+                var totalPrice = parseFloat(res.pprice);
+                $('.pop_loader').hide();
+                $("#pname").html('('+res.product_id+') '+res.pname);
+                $("#baseprice").html(res.pprice);
+                $("#qty").html('1');
+                $(".sub_total").html(res.pprice);
+                $("#totalPrice").html(+(totalPrice+ship_price).toFixed(2));
+            }
+        });
+    }
+    
+    function QtyChange(val){
+
+        var baseprice = $("#baseprice").html(); 
+        var total_price = baseprice*val;       
+        var ship_price = parseFloat($(".ship_price").html());    
+        $(".sub_total").html(+(baseprice*val).toFixed(2));
+        $("#totalPrice").html(+(total_price+ship_price).toFixed(2));
+        $('#qty').html(val);
+    }
+    $('#trialCheckbox').click(function(){
+        if($(this). prop("checked") == true){
+            $('.trial-value').show();
+        }else{
+             $('.trial-value').hide();
+        }
+    });
+    
+    function BillSameAsShip(params) {
+        if (params == 'yes') {
+            $('.BillingSameAsShipping').fadeOut();
+        }
+        else{
+            $('.BillingSameAsShipping').fadeIn();
+        }   
+    }
+    function ChangeShipping(shipping_id){
+        $('.pop_loader').show();
+        var baseprice = parseFloat($(".sub_total").html()); 
+        console.log(baseprice);
+         $.ajax({
+            type: 'POST',
+            url: "{{route('shippingChange')}}",
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: 'shipping_id=' + shipping_id,
+            dataType: "json",
+            success: function(res) {
+                
+                var ship_price = parseFloat(res.initial_amount);
+                console.log(ship_price);
+                $('.pop_loader').hide();
+                $("#totalPrice").html(+(baseprice+ship_price).toFixed(2));
+                $(".ship_price").html(res.initial_amount);
+            }
+        });
+    }
+    $('#affiliate_wrap').click(function(){
+        $('.affiliate_wrap').toggle('slow');
+    })
+
+     function creditCardTypeFromNumber(num) {
+       num = num.replace(/[^\d]/g,'');
+       if (num.match(/^5[1-5]\d{14}$/)) {
+         return 'master';
+       } else if (num.match(/^4\d{15}/) || num.match(/^4\d{12}/)) {
+         return 'visa';
+       } else if (num.match(/^6011\d{12}/)) {
+         return 'discover';
+       }
+       return '';
+    }
+    $('#CreditCard').keyup(function(){
+        var cardNumber_length = $(this).val().length;
+        console.log(cardNumber_length);
+        if(cardNumber_length >= 6){
+            var selected_card = $("#cc_type_n option:selected").val();
+            $('#cc_type_n option[value="'+selected_card+'"]').attr('selected', false);
+            var cardType = creditCardTypeFromNumber($(this).val());
+            $('#cc_type_n option[value="'+cardType+'"]').attr('selected', true);
+        }
+    });
+
+
+</script>
 </body>
 </html>

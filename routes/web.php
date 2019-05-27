@@ -44,4 +44,9 @@ Route::get('/admin/search-prospect','ProspectsController@searchProspect');
 
 Route::resource('/admin/crm', 'CrmController');
 Route::get('/admin/select-campaign','PlaceOrderController@index');
-Route::get('/admin/place-order/{id}','PlaceOrderController@campaign_find');
+//Ajax API below
+Route::post('/admin/campaignchange', 'PlaceOrderController@campaignchange')->name('campaignchange');
+Route::post('/admin/productchange', 'PlaceOrderController@productchange')->name('productchange');
+Route::post('/admin/shippingChange', 'PlaceOrderController@shippingChange')->name('shippingChange');
+
+Route::post('/admin/placeOrder','PlaceOrderController@placeOrder')->name('placeOrder');
