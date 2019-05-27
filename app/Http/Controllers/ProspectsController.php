@@ -17,6 +17,7 @@ use App\Prospect;
 use App\UploadedCsv;
 use App\Country;
 use App\State;
+use Helpers;
 
 class ProspectsController extends Controller
 {
@@ -32,8 +33,18 @@ class ProspectsController extends Controller
             return redirect('/admin/login');
         }
         
-        $allProspects = Prospect::sortable()->select('id','fname','lname','address','state','city','zip_code','created_at')->orderBy('id', 'DESC')->simplePaginate(50)->toArray();
-        //print_r($allProspects);die;
+        $respone = Helpers::checkRolePermissions();
+
+        if($respone == 1)
+        {
+            $allProspects = Prospect::sortable()->with('prospectCreatedUser')->select('id','fname','lname','address','state','city','zip_code','created_by','created_at')->orderBy('id', 'DESC')->simplePaginate(50)->toArray();
+        }
+        else if($respone == 0)
+        {
+            $userId = Session::get('userArray')['userId'];
+            $allProspects = Prospect::sortable()->with('prospectCreatedUser')->select('id','fname','lname','address','state','city','zip_code','created_by','created_at')->where(array('created_by'=> $userId))->orderBy('id', 'DESC')->simplePaginate(50)->toArray();
+        }
+        
         return view('prospects/index',compact('allProspects'));
     }
 

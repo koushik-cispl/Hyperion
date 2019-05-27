@@ -20,6 +20,11 @@ class Prospect extends Model
     {
         return $this->belongsTo('App\State', 'state');
     }*/
+
+    function prospectCreatedUser()
+    {
+        return $this->belongsTo('App\AdminUser', 'created_by');
+    }
     
 	public $sortable = ['fname', 'address', 'state', 'city', 'created_at'];
 }
