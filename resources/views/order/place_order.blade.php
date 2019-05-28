@@ -34,7 +34,7 @@
         <!-- Place order form -->
         <form action="{{route('placeOrder')}}" method="POST" name="OrderForm" id="OrderForm" class="form-horizontal">
             {{ csrf_field() }}
-            <input type="hidden" name="prospectId" value="68468" id="prospectId">
+            <input type="hidden" name="prospectId" value="{{ $prospectDetails['id'] }}" id="prospectId">
             <div class="pop_loader" id="pop_loader">
                 <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
                 </div>
@@ -206,7 +206,11 @@
                             <div class="col col-md-4"><label for="select" class=" form-control-label">Shipping State:</label></div>
                             <div class="col-12 col-md-8">
                                 <select name="ShippingState" id="ShippingState" class="form-control">
-                                    {!! \Helpers::get_states(); !!}
+                                    <?php $states = \Helpers::get_states(); ?>
+                                    <option value="">Select State</option>
+                                    @foreach ($states  as $key => $value)
+                                    <option value="{{$key}}" {{ ($prospectDetails['state'] == $key ? "selected":"") }}>{{$value}}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -312,7 +316,11 @@
                                 <div class="col col-md-4"><label for="select" class=" form-control-label">Billing State:</label></div>
                                 <div class="col-12 col-md-8">
                                     <select name="BillingState" id="BillingState" class="form-control">
-                                         {!! \Helpers::get_states(); !!}
+                                        <?php $states = \Helpers::get_states(); ?>
+                                        <option value="">Select State</option>
+                                        @foreach ($states  as $key => $value)
+                                        <option value="{{$key}}">{{$value}}</option>
+                                        @endforeach
                                     </select>
                                     @if ($errors->has('BillingState'))
                                             @foreach ($errors->get('BillingState') as $error)
@@ -438,10 +446,10 @@
                                     <div class="row">
                                     <div class="col-12 col-md-6">
                                 <select name="ExpMonth" id="ExpMonth" class="form-control">
-                                   <?php $months = \Helpers::get_months(); ?>
+                                    <?php $months = \Helpers::get_months(); ?>
                                     <option value=""> Select Month</option>
                                     @foreach ($months  as $key=>$value)
-                                <option value="{{$key}}"> ({{$key}}) {{$value}}</option>                                       
+                                    <option value="{{$key}}"> ({{$key}}) {{$value}}</option>
                                     @endforeach
                                 </select>
                                 @if ($errors->has('ExpMonth'))
