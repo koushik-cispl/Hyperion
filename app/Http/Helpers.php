@@ -97,15 +97,8 @@ class Helpers
             '11' => 'November',
             '12' => 'December',
         );
-
-        $options = '<option value="">Month</option>';
-        foreach ($months as $key => $value) {
-            $options .= sprintf('<option value="%s">%s</option>', $key, "($key) " . $value);
-        }
-
-        return $options;
+        return $months;
     }
-
     public static function get_years()
     {
         $year = date('Y');
