@@ -134,7 +134,7 @@ else
                                                         <a class="btn btn-info userListingAction" href="{{route('prospects.show',$prospects['id'])}}" role="button" title="View Prospect">
                                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                                         </a>
-                                                        <a class="btn btn-success userListingAction" href="#" role="button" title="Place Order">
+                                                        <a class="btn btn-success userListingAction" href="{{url('/admin/select-campaign/'.$prospects['id'])}}" role="button" title="Place Order">
                                                             <i class="fa fa-credit-card-alt" aria-hidden="true"></i>
                                                         </a>
                                                     </td>

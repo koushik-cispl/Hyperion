@@ -384,7 +384,12 @@ class ProspectsController extends Controller
         
         $serachTerm = $_GET['search'];
 
-        $allProspects = Prospect::where('fname', 'LIKE', '%' . $serachTerm . '%')->orWhere('lname', 'LIKE', '%' . $serachTerm . '%')->orderBy('id', 'DESC')->simplePaginate(50)->toArray();
+        if($serachTerm == '')
+        {
+            return redirect('/admin/prospects');
+        }
+
+        $allProspects = Prospect::sortable()->with('prospectCreatedUser')->select('id','fname','lname','address','state','city','zip_code','created_by','created_at')->where('fname', 'LIKE', '%' . $serachTerm . '%')->orWhere('lname', 'LIKE', '%' . $serachTerm . '%')->orderBy('id', 'DESC')->simplePaginate(50)->toArray();
         //$allProspects->appends(['search' => $serachTerm]);
         //print_r($allProspects);die;
         return view('prospects/index',compact('allProspects'));
