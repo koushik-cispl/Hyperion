@@ -34,6 +34,7 @@
         <!-- Place order form -->
         <form action="{{route('placeOrder')}}" method="POST" name="OrderForm" id="OrderForm" class="form-horizontal">
             {{ csrf_field() }}
+            <input type="hidden" name="prospectId" value="68468" id="prospectId">
             <div class="pop_loader" id="pop_loader">
                 <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
                 </div>
@@ -48,16 +49,17 @@
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="exampleInputName2" class="pr-1  form-control-label">Select Campaign:</label></div>
                         
-                            <div class="col-12 col-md-8"><select class="form-control" onchange="ChangeCampaign($(this).val());" name="campaignId" id="campaignId" >
-                                <option value="">Select Campaign</option>
-                                <?php array_walk($campaign_id, function ($campaign_id,$key) use ($campaign_name) { 
-                                ?>
-                                <option value="<?php echo $campaign_id; ?>"><?php echo '('.$campaign_id.') '. $campaign_name[$key];  ?></option> 
-                                <?php
-                                    });
+                            <div class="col-12 col-md-8">
+                                <select class="form-control" onchange="ChangeCampaign($(this).val());" name="campaignId" id="campaignId" >
+                                    <option value="">Select Campaign</option>
+                                    <?php array_walk($campaign_id, function ($campaign_id,$key) use ($campaign_name) { 
                                     ?>
-                            </select>
-                                     @if ($errors->has('campaignId'))
+                                    <option value="<?php echo $campaign_id; ?>"><?php echo '('.$campaign_id.') '. $campaign_name[$key];  ?></option> 
+                                    <?php
+                                        });
+                                        ?>
+                                </select>
+                                    @if ($errors->has('campaignId'))
                                         @foreach ($errors->get('campaignId') as $error)
                                             <span class="help-block formValidationError">{{ $error }}</span>
                                         @endforeach
@@ -133,14 +135,14 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                                <strong>Shipping / Billing Information:</strong>
+                    <strong>Shipping / Billing Information:</strong>
                 </div>
                 <div class="card-body card-block">
                     
                     <div class="row form-group">
                         <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping First Name:</label></div>
                             <div class="col-12 col-md-8">
-                                <input type="text" id="ShippingFirstName" value="" name="ShippingFirstName" class="form-control">
+                                <input type="text" id="ShippingFirstName" value="{{ $prospectDetails['fname'] }}" name="ShippingFirstName" class="form-control">
                                     @if ($errors->has('ShippingFirstName'))
                                         @foreach ($errors->get('ShippingFirstName') as $error)
                                         <span class="help-block formValidationError">{{ $error }}</span>
@@ -150,7 +152,7 @@
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping Last Name:</label></div>
-                            <div class="col-12 col-md-8"><input type="text" id="ShippingLastName" name="ShippingLastName" class="form-control">
+                            <div class="col-12 col-md-8"><input type="text" id="ShippingLastName" name="ShippingLastName" class="form-control" value="{{ $prospectDetails['lname'] }}">
                                 @if ($errors->has('ShippingLastName'))
                                     @foreach ($errors->get('ShippingLastName') as $error)
                                         <span class="help-block formValidationError">{{ $error }}</span>
@@ -160,7 +162,7 @@
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping Address:</label></div>
-                            <div class="col-12 col-md-8"><input type="text" id="ShippingAddress" name="ShippingAddress" class="form-control">
+                            <div class="col-12 col-md-8"><input type="text" id="ShippingAddress" name="ShippingAddress" class="form-control" value="{{ $prospectDetails['address'] }}">
                             @if ($errors->has('ShippingAddress'))
                                         @foreach ($errors->get('ShippingAddress') as $error)
                                             <span class="help-block formValidationError">{{ $error }}</span>
@@ -170,11 +172,11 @@
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping Address2:</label></div>
-                            <div class="col-12 col-md-8"><input type="text" id="ShippingAddress2" name="ShippingAddress2" class="form-control"></div>
+                            <div class="col-12 col-md-8"><input type="text" id="ShippingAddress2" name="ShippingAddress2" class="form-control" value="{{ $prospectDetails['address2'] }}"></div>
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping City:</label></div>
-                            <div class="col-12 col-md-8"><input type="text" id="ShippingCity" name="ShippingCity" class="form-control">
+                            <div class="col-12 col-md-8"><input type="text" id="ShippingCity" name="ShippingCity" class="form-control" value="{{ $prospectDetails['city'] }}">
                             @if ($errors->has('ShippingCity'))
                                         @foreach ($errors->get('ShippingCity') as $error)
                                             <span class="help-block formValidationError">{{ $error }}</span>
@@ -184,7 +186,7 @@
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="text-input" class=" form-control-label">Shipping Zip Code:</label></div>
-                            <div class="col-12 col-md-8"><input type="tel" id="ShippingZipCode" name="ShippingZipCode" class="form-control">
+                            <div class="col-12 col-md-8"><input type="tel" id="ShippingZipCode" name="ShippingZipCode" class="form-control" value="{{ $prospectDetails['zip_code'] }}">
                             @if ($errors->has('ShippingZipCode'))
                                         @foreach ($errors->get('ShippingZipCode') as $error)
                                             <span class="help-block formValidationError">{{ $error }}</span>
@@ -210,7 +212,7 @@
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="text-input" class=" form-control-label">Phone:</label></div>
-                            <div class="col-12 col-md-8"><input type="tel" id="Phone" name="Phone" class="form-control">
+                            <div class="col-12 col-md-8"><input type="tel" id="Phone" name="Phone" class="form-control" value="{{ $prospectDetails['mobile'] }}">
                             @if ($errors->has('Phone'))
                                         @foreach ($errors->get('Phone') as $error)
                                             <span class="help-block formValidationError">{{ $error }}</span>
@@ -220,7 +222,7 @@
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="email-input" class=" form-control-label">Email</label></div>
-                            <div class="col-12 col-md-8"><input type="email" id="Email" name="Email" class="form-control">
+                            <div class="col-12 col-md-8"><input type="email" id="Email" name="Email" class="form-control" value="{{ $prospectDetails['email'] }}">
                             @if ($errors->has('Email'))
                                         @foreach ($errors->get('Email') as $error)
                                             <span class="help-block formValidationError">{{ $error }}</span>
@@ -381,12 +383,14 @@
                                             <td>$<span class="sub_total" >0.00</span></td>
                                         </tr>
                                         <tr>
-                                            <td></td><td></td>
-                                            <td> <span class="product">Sub Total:</span> </td>
+                                            <td><span class="product">Sub Total:</span></td>
+                                            <td></td>
+                                            <td></td>
                                             <td>$<span class=" sub_total">0.00</span></td>
                                             </tr>
-                                        <tr><td> </td><td></td>
-                                            <td> <span class="product">Shipping:</span> </td>
+                                        <tr><td><span class="product">Shipping:</span></td>
+                                            <td></td>
+                                            <td></td>
                                             <td>$<span class="ship_price">0.00</span></td>
                                         </tr>
                                          <tr><td><strong>Grand Total:</strong> </td><td></td>

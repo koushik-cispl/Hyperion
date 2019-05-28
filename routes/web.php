@@ -43,7 +43,7 @@ Route::post('/admin/uploadcsv','ProspectsController@uploadcsv');
 Route::get('/admin/search-prospect','ProspectsController@searchProspect');
 
 Route::resource('/admin/crm', 'CrmController');
-Route::get('/admin/select-campaign','PlaceOrderController@index');
+Route::get('/admin/select-campaign/{id}','PlaceOrderController@index');
 //Ajax API below
 Route::post('/admin/campaignchange', 'PlaceOrderController@campaignchange')->name('campaignchange');
 Route::post('/admin/productchange', 'PlaceOrderController@productchange')->name('productchange');
