@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use Illuminate\Http\Request;
 use Helpers;
+use Session;
 use App\CrmConfiguration;
 use App\State;
+use App\Prospect;
 
 class PlaceOrderController extends Controller
 {
@@ -15,10 +17,15 @@ class PlaceOrderController extends Controller
         
     }
     
-    public function index()
+    public function index($prospectId)
     {
-        // $states = State::select('');
-        //dd($states);
+        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','address2','state','city','zip_code','order_place_status')->where(array('id'=> $prospectId))->first()->toArray();
+
+        if($prospectDetails['order_place_status'] == 1)
+        {
+            Session::flash('orderErrorMessage','It seems order is already placed for this prospect.');
+            return redirect('/admin/prospects');
+        }
         $crm = CrmConfiguration::find(1);
         $methodName = 'campaign_find_active';
         $params = array(
@@ -35,7 +42,7 @@ class PlaceOrderController extends Controller
         $campaign_id = explode(',', $campaigns[1]);
         $campaign_name = explode(',', urldecode($campaignsName[1]));
 
-        return view('order.place_order', compact('campaign_id','campaign_name'));
+        return view('order.place_order', compact('campaign_id','campaign_name','prospectDetails'));
     }
 
     public function campaignchange(Request $request)
