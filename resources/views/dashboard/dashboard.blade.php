@@ -51,7 +51,7 @@
                                     </div>
                                     <div class="stat-content">
                                         <div class="text-left dib">
-                                            <div class="stat-text"><span class="count">0</span></div>
+                                            <div class="stat-text"><span class="count">{{ $orders }}</span></div>
                                             <div class="stat-heading">Sales</div>
                                         </div>
                                     </div>
