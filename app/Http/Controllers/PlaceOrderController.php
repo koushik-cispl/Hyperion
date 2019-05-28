@@ -318,7 +318,7 @@ class PlaceOrderController extends Controller
                 $order_id = $content->order_id;
                 $prospect = Prospect::find($prospectId);
                 $prospect->order_place_status = 1;
-                $prospect->campaign_id = $order_id;
+                $prospect->order_id = $order_id;
                 $prospect->save();
                 return redirect('admin/prospects')->with('orderSuccessMessage','Order has been created successfully, Order Id: '. $order_id);
             }

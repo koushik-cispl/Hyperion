@@ -23,8 +23,9 @@ class DashboardController extends Controller
         }
     	$users = DB::table('admin_users')->count();
         $prospects = DB::table('prospects')->count();
+        $orders = DB::table('prospects')->where('order_place_status', 1)->count();
 
-    	return view('dashboard/dashboard',compact('users','prospects'));
+    	return view('dashboard/dashboard',compact('users','prospects','orders'));
     }
 
     public function profile(Request $request)
