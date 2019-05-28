@@ -19,5 +19,5 @@ $('.close-btn').click(function(){
 })
 setTimeout(function(){
     $('.alert-close').fadeOut('slow');
-}, 5000);
+}, 6000);
 </script>

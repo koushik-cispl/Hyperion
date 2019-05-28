@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Helpers;
 use App\CrmConfiguration;
 use App\State;
+use App\Prospect;
 
 class PlaceOrderController extends Controller
 {
@@ -54,6 +55,7 @@ class PlaceOrderController extends Controller
         $criteria = "{\n\t\"campaign_id\":\"$campaignId\"\n}";
         $response = Helpers::makeRequest($loginInfo,$url,$criteria);
         $content = json_decode($response);
+        //dd($content);
         if ($content->response_code=='100') {
             $campaign_view_url = 'https://'.$crm->api_endpoint.'/api/v1/campaign_view';
             $campaign_data = Helpers::makeRequest($loginInfo,$campaign_view_url,$criteria);
@@ -70,7 +72,7 @@ class PlaceOrderController extends Controller
                 
             }
             }
-        }
+        
         $offer_id = $content->data['0']->id;
         $offer_name = $content->data['0']->name;
         $products = $content->data['0']->products;
@@ -79,8 +81,7 @@ class PlaceOrderController extends Controller
         $product_ids="";
         $product_ids .= '<option value="">Select Product</option>';
         $billing_model_ids="";
-        
-        
+
          if(!empty($offer_id))
         {
                 $offer_ids .='<option value="'.$offer_id.'">('.$offer_id.') '.$offer_name.'</option>';
@@ -115,6 +116,17 @@ class PlaceOrderController extends Controller
         'billing_model_ids' => $billing_model_ids,'shipping_ids'=>$shipping_ids,'ship_price'=>$ship_price));
         echo $jsonArray;
         exit;
+    }
+    else{
+        $error_massages = $content->error_message;
+       
+        $error = $error_massages['0'];
+        $error_massage = explode('{',$error);
+            
+        $jsonArray = json_encode(array('errors' => 'yes', 'error_massage'=> $error_massage[0]));
+        echo $jsonArray; 
+        exit;
+    }
        } catch (Exception $ex) {
             throw new Exception( $ex->getMessage() );
         }
@@ -159,137 +171,148 @@ class PlaceOrderController extends Controller
         $crm = CrmConfiguration::find('1');
         $BillasShipp = $request->input('BillasShipp');
         $ip = Helpers::getIP();
-        $this->validate($request,[
-            'ShippingFirstName' => 'required',
-            'ShippingLastName' => 'required',
-            'ShippingAddress' => 'required',
-            'ShippingCity' => 'required',
-            'ShippingZipCode' => 'required',
-            'Phone' => 'required',
-            'Email' => 'required',
-            'CardType' => 'required',
-            'CreditCard' => 'required',
-            'ExpMonth' => 'required',
-            'ExpYear' => 'required',
-            'Cvv' => 'required',
-        ]);
-        
-
-        if ($BillasShipp == "no") {
+        if (($request->input('campaignId')!='') && ($request->input('product_id')!='')) {
+            
             $this->validate($request,[
-            'BillingFirstName' => 'required',
-            'BillingLastName' => 'required',
-            'BillingAddress' => 'required',
-            'BillingCity' => 'required',
-            'BillingZipCode' => 'required',
-        ]);
-        }
+                'ShippingFirstName' => 'required',
+                'ShippingLastName' => 'required',
+                'ShippingAddress' => 'required',
+                'ShippingCity' => 'required',
+                'ShippingZipCode' => 'required',
+                'Phone' => 'required',
+                'Email' => 'required',
+                'CardType' => 'required',
+                'CreditCard' => 'required',
+                'ExpMonth' => 'required',
+                'ExpYear' => 'required',
+                'Cvv' => 'required',
+            ]);
+            
 
-        $ShippingFirstName = $request->input('ShippingFirstName');
-        $ShippingLastName = $request->input('ShippingLastName');
-        $ShippingAddress = $request->input('ShippingAddress');
-        $ShippingAddress2 = $request->input('ShippingAddress2');
-        $ShippingCity = $request->input('ShippingCity');
-        $ShippingZipCode = $request->input('ShippingZipCode');
-        $ShippingState = $request->input('ShippingState');
-        $ShippingCountry = $request->input('ShippingCountry');
-        $Phone = $request->input('Phone');
-        $Email = $request->input('Email');
-        $CardType = $request->input('CardType');
-        $CreditCard = $request->input('CreditCard');
-        $ExpMonth = $request->input('ExpMonth');
-        $ExpYear = $request->input('ExpYear');
-        $Cvv = $request->input('Cvv');
-        if ($BillasShipp == "no") {
-        $BillasShipp = 'no';
-        $BillingFirstName = $request->input('BillingFirstName');
-        $BillingLastName = $request->input('BillingLastName');
-        $BillingAddress = $request->input('BillingAddress');
-        $BillingCity = $request->input('BillingCity');
-        $BillingZipCode = $request->input('BillingZipCode');
-        $BillingState = $request->input('BillingState');
-        $BillingCountry = $request->input('BillingCountry');  
-        }else{
-        $BillasShipp = 'yes' ;
-        $BillingFirstName = '';
-        $BillingLastName = '';
-        $BillingAddress = '';
-        $BillingCity = '';
-        $BillingZipCode = '';
-        $BillingState = '';
-        $BillingCountry = ''; 
-        }
+            if ($BillasShipp == "no") {
+                $this->validate($request,[
+                'BillingFirstName' => 'required',
+                'BillingLastName' => 'required',
+                'BillingAddress' => 'required',
+                'BillingCity' => 'required',
+                'BillingZipCode' => 'required',
+            ]);
+            }
 
-        // CRM Info
-        $campaignId = $request->input('campaignId');
-        $shippingId = $request->input('shippingId');
-        $product_id = $request->input('product_id');
-        $offer_id = $request->input('offer_id');
-        $billing_model_id = $request->input('billing_model_id');
-        $quantity = $request->input('quantity');
-        $step_num = '1';
+            $ShippingFirstName = $request->input('ShippingFirstName');
+            $ShippingLastName = $request->input('ShippingLastName');
+            $ShippingAddress = $request->input('ShippingAddress');
+            $ShippingAddress2 = $request->input('ShippingAddress2');
+            $ShippingCity = $request->input('ShippingCity');
+            $ShippingZipCode = $request->input('ShippingZipCode');
+            $ShippingState = $request->input('ShippingState');
+            $ShippingCountry = $request->input('ShippingCountry');
+            $Phone = $request->input('Phone');
+            $Email = $request->input('Email');
+            $CardType = $request->input('CardType');
+            $CreditCard = $request->input('CreditCard');
+            $ExpMonth = $request->input('ExpMonth');
+            $ExpYear = $request->input('ExpYear');
+            $Cvv = $request->input('Cvv');
+            if ($BillasShipp == "no") {
+            $BillasShipp = 'no';
+            $BillingFirstName = $request->input('BillingFirstName');
+            $BillingLastName = $request->input('BillingLastName');
+            $BillingAddress = $request->input('BillingAddress');
+            $BillingCity = $request->input('BillingCity');
+            $BillingZipCode = $request->input('BillingZipCode');
+            $BillingState = $request->input('BillingState');
+            $BillingCountry = $request->input('BillingCountry');  
+            }else{
+            $BillasShipp = 'yes' ;
+            $BillingFirstName = '';
+            $BillingLastName = '';
+            $BillingAddress = '';
+            $BillingCity = '';
+            $BillingZipCode = '';
+            $BillingState = '';
+            $BillingCountry = ''; 
+            }
 
-        $jsonParams = array (
-                    'firstName' => $ShippingFirstName,
-                    'lastName' => $ShippingLastName,
-                    'email' => $Email,
-                    'phone' => $Phone,
-                    'shippingAddress1' => $ShippingAddress,
-                    'shippingAddress2' => $ShippingAddress2,
-                    'shippingZip' => $ShippingZipCode,
-                    'shippingCity' => $ShippingCity,
-                    'shippingState' => $ShippingState,
-                    'shippingCountry' => $ShippingCountry,
-                    'billingSameAsShipping' => $BillasShipp,
-                    'billingFirstName' => $BillingFirstName,
-                    'billingLastName' => $BillingLastName,
-                    'billingAddress1' => $BillingAddress,
-                    'billingZip' => $BillingZipCode,
-                    'billingCity' => $BillingCity,
-                    'billingState' => $BillingState,
-                    'billingCountry' => $BillingCountry,
-                    'ipAddress' => $ip,
-                    'campaignId' => $campaignId,
-                    'AFID' => $request->input('AFID') ? $request->input('AFID') : '',
-                    'SID' => $request->input('SID') ? $request->input('SID') : '',
-                    'AFFID' => $request->input('AFFID') ? $request->input('AFFID') : '',
-                    'C1' => $request->input('C1') ? $request->input('C1') : '',
-                    'C2' => $request->input('C2') ? $request->input('C2') : '',
-                    'C3' => $request->input('C3') ? $request->input('C3') : '',
-                    'offers' => 
-                    array (
-                        0 => 
+            // CRM Info
+            $campaignId = $request->input('campaignId');
+            $shippingId = $request->input('shippingId');
+            $product_id = $request->input('product_id');
+            $offer_id = $request->input('offer_id');
+            $billing_model_id = $request->input('billing_model_id');
+            $quantity = $request->input('quantity');
+            $step_num = '1';
+
+            $jsonParams = array (
+                        'firstName' => $ShippingFirstName,
+                        'lastName' => $ShippingLastName,
+                        'email' => $Email,
+                        'phone' => $Phone,
+                        'shippingAddress1' => $ShippingAddress,
+                        'shippingAddress2' => $ShippingAddress2,
+                        'shippingZip' => $ShippingZipCode,
+                        'shippingCity' => $ShippingCity,
+                        'shippingState' => $ShippingState,
+                        'shippingCountry' => $ShippingCountry,
+                        'billingSameAsShipping' => $BillasShipp,
+                        'billingFirstName' => $BillingFirstName,
+                        'billingLastName' => $BillingLastName,
+                        'billingAddress1' => $BillingAddress,
+                        'billingZip' => $BillingZipCode,
+                        'billingCity' => $BillingCity,
+                        'billingState' => $BillingState,
+                        'billingCountry' => $BillingCountry,
+                        'ipAddress' => $ip,
+                        'campaignId' => $campaignId,
+                        'AFID' => $request->input('AFID') ? $request->input('AFID') : '',
+                        'SID' => $request->input('SID') ? $request->input('SID') : '',
+                        'AFFID' => $request->input('AFFID') ? $request->input('AFFID') : '',
+                        'C1' => $request->input('C1') ? $request->input('C1') : '',
+                        'C2' => $request->input('C2') ? $request->input('C2') : '',
+                        'C3' => $request->input('C3') ? $request->input('C3') : '',
+                        'offers' => 
                         array (
-                        'offer_id' => $offer_id,
-                        'billing_model_id' => $billing_model_id,
-                        'quantity' => $quantity,
-                        'product_id' => $product_id,
-                        'step_num' => 1,
+                            0 => 
+                            array (
+                            'offer_id' => $offer_id,
+                            'billing_model_id' => $billing_model_id,
+                            'quantity' => $quantity,
+                            'product_id' => $product_id,
+                            'step_num' => 1,
+                            ),
                         ),
-                    ),
-                    'shippingId' => $shippingId,
-                    'creditCardType' => $CardType,
-                    'creditCardNumber' => $CreditCard,
-                    'CVV' => $Cvv,
-                    'expirationDate' => $ExpMonth.$ExpYear,
-                    'tranType' => 'Sale',
-                    'notes' => $request->input('notes') ? $request->input('notes') : '',
-                );
+                        'shippingId' => $shippingId,
+                        'creditCardType' => $CardType,
+                        'creditCardNumber' => $CreditCard,
+                        'CVV' => $Cvv,
+                        'expirationDate' => $ExpMonth.$ExpYear,
+                        'tranType' => 'Sale',
+                        'notes' => $request->input('notes') ? $request->input('notes') : '',
+                    );
 
-                
-            $url = 'https://' . $crm->api_endpoint . '/api/v1/new_order';
-            $loginInfo = 'Basic ' . base64_encode($crm->api_username . ':' . $crm->api_password);
-            $jsonParams = json_encode($jsonParams);
-            $response = Helpers::makeRequest($loginInfo, $url, $jsonParams);
-            $content = json_decode($response);
-            dd($content);
-           if ($content->response_code == 100) {
-                $order_id = $content->order_id;
-                return redirect()->back()->with('successMessage','Order has been created successfully');
-           }else{
-               $error = $content->error_message;
-               $errdecline_reasonor = $content->decline_reason;
-           }
+                    
+                $url = 'https://' . $crm->api_endpoint . '/api/v1/new_order';
+                $loginInfo = 'Basic ' . base64_encode($crm->api_username . ':' . $crm->api_password);
+                $jsonParams = json_encode($jsonParams);
+                $response = Helpers::makeRequest($loginInfo, $url, $jsonParams);
+                $content = json_decode($response);
+            // dd($content);
+            if ($content->response_code == 100) {
+                    $order_id = $content->order_id;
+                    $prospect = Prospect::find('55434');
+                    $prospect->order_place_status = 1;
+                    $prospect->campaign_id = $order_id;
+                    $prospect->save();
+                    return redirect('admin/prospects')->with('orderSuccessMessage','Order has been created successfully, Order Id: '. $order_id);
+            }else{
+                $error = $content->error_message;
+                $decline_reason = $content->decline_reason;
+                return redirect()->back()->with('orderErrorMessage', 'Your order has been declined, '.$decline_reason);
+            }
+        }
+        else{ // If not select CID & PID
+            return redirect()->back()->with('orderErrorMessage','Please select Campaign & Products Properly');
+        }
            
 
     }

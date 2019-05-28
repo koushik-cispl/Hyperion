@@ -17,6 +17,7 @@
         <!-- Header-->
 
         <div class="content">
+            @include('common/message-show')
             <div class="animated">
 
                 <div class="card">
@@ -25,6 +26,7 @@
                         <strong class="card-title" v-if="headerText">Place Order</strong>
                     </div>
               </div>
+              
 
           
      
@@ -33,11 +35,11 @@
         <form action="{{route('placeOrder')}}" method="POST" name="OrderForm" id="OrderForm" class="form-horizontal">
             {{ csrf_field() }}
             <div class="pop_loader" id="pop_loader">
-                                <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-                                </div>
+                <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+                </div>
             <div class="row">
         <div class="col-lg-6">
-            <div class="loader" style="display:none;"></div>
+           
             <div class="card">
                 <div class="card-header">
                     <strong>Campaign Information:</strong>
@@ -60,6 +62,7 @@
                                             <span class="help-block formValidationError">{{ $error }}</span>
                                         @endforeach
                                     @endif
+                                     <span class="help-block formValidationError error-text"></span>
                                 </div>
                         </div>
                     </div>
@@ -417,7 +420,7 @@
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="text-input" class=" form-control-label">Credit Card Number:</label></div>
-                            <div class="col-12 col-md-8"><input type="tel" maxlength="16" id="CreditCard" name="CreditCard" class="form-control" onkeyup="javascript:this.value=this.value.replace(/[^0-9]/g,'');">
+                            <div class="col-12 col-md-8"><input type="tel" maxlength="16" id="CreditCard" name="CreditCard" class="form-control" value="{{ old('CreditCard') }}" onkeyup="javascript:this.value=this.value.replace(/[^0-9]/g,'');">
                             @if ($errors->has('CreditCard'))
                                      @foreach ($errors->get('CreditCard') as $error)
                                         <span class="help-block formValidationError">{{ $error }}</span>
@@ -431,7 +434,11 @@
                                     <div class="row">
                                     <div class="col-12 col-md-6">
                                 <select name="ExpMonth" id="ExpMonth" class="form-control">
-                                   {!! \Helpers::get_months(); !!}
+                                   <?php $months = \Helpers::get_months(); ?>
+                                    <option value=""> Select Month</option>
+                                    @foreach ($months  as $key=>$value)
+                                <option value="{{$key}}"> ({{$key}}) {{$value}}</option>                                       
+                                    @endforeach
                                 </select>
                                 @if ($errors->has('ExpMonth'))
                                      @foreach ($errors->get('ExpMonth') as $error)
@@ -442,6 +449,7 @@
                                     <div class="col-12 col-md-6">
                                  <select name="ExpYear" id="ExpYear" class="form-control">
                                     {!! \Helpers::get_years(); !!}
+                                    
                                 </select>
                                 @if ($errors->has('ExpYear'))
                                      @foreach ($errors->get('ExpYear') as $error)
@@ -454,7 +462,7 @@
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="text-input" class=" form-control-label">CVV:</label></div>
-                            <div class="col-12 col-md-8"><input type="tel" id="Cvv" maxlength="4" name="Cvv" class="form-control">
+                        <div class="col-12 col-md-8"><input type="tel" id="Cvv" value="{{ old('Cvv')}}" maxlength="4" name="Cvv" onkeyup="javascript:this.value=this.value.replace(/[^0-9]/g,'');" class="form-control">
                             @if ($errors->has('Cvv'))
                                      @foreach ($errors->get('Cvv') as $error)
                                         <span class="help-block formValidationError">{{ $error }}</span>
@@ -500,6 +508,12 @@
             data: 'campaign=' + campaign,
             dataType: "json",
             success: function(res) {
+                if (res.errors =="yes") {
+                    $('.pop_loader').hide();
+                    $('.error-text').html(res.error_massage+', Please give the proper access to your API!');
+
+                } else{
+                $('.error-text').html('');
                 $('.pop_loader').hide();
                 $("#offer_id").html(res.offer_ids);
                 $("#product_id").html(res.product_ids);
@@ -508,6 +522,7 @@
                 $("#shippingId").html(res.shipping_ids);
                 $(".ship_price").html(res.ship_price);
                 $("#totalPrice").html(res.ship_price);
+                }
             }
         });
 	}
