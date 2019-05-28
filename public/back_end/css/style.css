@@ -2204,6 +2204,10 @@ Googel Fonts  */
                                                                       position: relative;
                                                                       right: 7px;
                                                                     }
+.table-stats table th .name, .table-stats table td .name , td,tr{
+   
+    text-transform: none;
+}
                                                                     @media (max-width: 1680px) {
                                                                       .timeline li {
                                                                         padding: 2px 0; } }

@@ -137,8 +137,13 @@ class PlaceOrderController extends Controller
                 echo $jsonArray; 
                 exit;
             }
-        } catch (Exception $ex) {
-            throw new Exception( $ex->getMessage() );
+        } 
+        catch (Exception $ex) 
+        {
+            $jsonArray = json_encode(array('errors' => 'yes', 'error_massage' => $ex->getMessage()));
+            echo $jsonArray;
+            exit;
+
         }
     }
 
