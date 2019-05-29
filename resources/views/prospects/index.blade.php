@@ -219,7 +219,11 @@ else
                                     <h1>Drag and Drop file here Or Click to select file <span>(.CSV Format)</span></h1>
                                 </div>
 
-                                <button type="submit" onclick="uploadCsvFile();" name="fileUploadBtn" id="fileUploadBtn"><i id="fileLoader" class="fa fa-spinner" style="display: none" ></i> UPLOAD</button>
+                                <!-- <i id="fileLoader" class="fa fa-spinner" style="display: none" ></i> -->
+                                <div class="pop_loader pop_loader2" id="prospectLoader" style="display: none;">
+                                    <div class="lds-roller lds-roller2"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+                                </div>
+                                <button type="submit" onclick="uploadCsvFile();" name="fileUploadBtn" id="fileUploadBtn">UPLOAD</button>
                             </form>
                         </div>
                     </div>
@@ -312,7 +316,9 @@ else
 
     function uploadCsvFile()
     {
-        $("#fileLoader").fadeIn('slow');
+        $("#prospectLoader").fadeIn('slow');
+        $("#fileUploadBtn").addClass('disableBtn').prop("disabled", true).text("Uploading, Please wait...");
+        
         $.ajax({
             url: "{{url('admin/uploadcsv')}}",
             headers: {
@@ -324,8 +330,9 @@ else
             processData: false,
             //dataType: 'json',
             success: function(response){
-                $("#fileLoader").fadeOut('slow');
-
+                $("#prospectLoader").fadeOut('slow');
+                $("#fileUploadBtn").removeClass('disableBtn').prop("disabled", false).text("UPLOAD");
+                
                 var jsonData = $.parseJSON(response); 
                 var status = jsonData.status;
                 var message = jsonData.message;

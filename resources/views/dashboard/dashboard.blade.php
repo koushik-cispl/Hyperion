@@ -1,5 +1,10 @@
 <!doctype html>
 <html class="no-js" lang="">
+
+<?php
+$userRole = \Helpers::checkRolePermissions();
+?>
+
 <head>
     @include('common/base')
 </head>
@@ -24,6 +29,8 @@
             <div class="animated fadeIn listingCls">
                 <!-- Widgets  -->
                 <div class="row">
+
+                    <?php if($userRole == 1) { ?>
                     <div class="col-lg-3 col-md-6">
                         <div class="card">
                             <div class="card-body">
@@ -41,6 +48,7 @@
                             </div>
                         </div>
                     </div>
+                    <?php } ?>
 
                     <div class="col-lg-3 col-md-6">
                         <div class="card">
