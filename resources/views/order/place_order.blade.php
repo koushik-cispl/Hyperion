@@ -37,7 +37,7 @@
             <input type="hidden" name="prospectId" value="{{ $prospectDetails['id'] }}" id="prospectId">
             <div class="pop_loader" id="pop_loader">
                 <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-                </div>
+            </div>
             <div class="row">
         <div class="col-lg-6">
            

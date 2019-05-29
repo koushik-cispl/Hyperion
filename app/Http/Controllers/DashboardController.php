@@ -12,6 +12,7 @@ use Mail;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\AdminUser;
+use Helpers;
 
 class DashboardController extends Controller
 {
@@ -21,9 +22,23 @@ class DashboardController extends Controller
         {
             return redirect('/admin/login');
         }
-    	$users = DB::table('admin_users')->count();
-        $prospects = DB::table('prospects')->count();
-        $orders = DB::table('prospects')->where('order_place_status', 1)->count();
+
+        $userId = Session::get('userArray')['userId'];
+        $respone = Helpers::checkRolePermissions();
+
+        if($respone == 1)
+        {
+            $users = DB::table('admin_users')->count();
+            $prospects = DB::table('prospects')->count();
+            $orders = DB::table('prospects')->where('order_place_status', 1)->count();
+        }
+        else if($respone == 0)
+        {
+            $users = DB::table('admin_users')->count();
+            $prospects = DB::table('prospects')->where(array('created_by'=> $userId))->count();
+            $orders = DB::table('prospects')->where(array('created_by'=> $userId, 'order_place_status' => 1))->count();
+        }
+    	
 
     	return view('dashboard/dashboard',compact('users','prospects','orders'));
     }

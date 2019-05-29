@@ -19,11 +19,11 @@ class PlaceOrderController extends Controller
     
     public function index($prospectId)
     {
-        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','address2','state','city','zip_code','order_place_status')->where(array('id'=> $prospectId))->first()->toArray();
+        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','address2','state','city','zip_code','order_place_status','order_id')->where(array('id'=> $prospectId))->first()->toArray();
 
         if($prospectDetails['order_place_status'] == 1)
         {
-            Session::flash('orderErrorMessage','It seems order is already placed for this prospect.');
+            Session::flash('orderErrorMessage','It seems order is already placed for this prospect. Order Id is : '.$prospectDetails['order_id']);
             return redirect('/admin/prospects');
         }
         $crm = CrmConfiguration::find(1);

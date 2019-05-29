@@ -2721,3 +2721,17 @@ label{font-size: 14px;}
     margin: 0 2px;
 }
 .userListingAction i.fa{font-size: 14px;}
+#fileUploadForm{position: relative;}
+.pop_loader2{    background-color: transparent; top:0;}
+.lds-roller2 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -33px;
+    margin-top: -80px;
+}
+.lds-roller2 div:after{background: #000;}
+.disableBtn {
+  background-color: #666 !important;
+  border-color: #666 !important;
+}
