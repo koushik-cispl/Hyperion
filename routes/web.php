@@ -41,6 +41,7 @@ Route::resource('/admin/prospects', 'ProspectsController');
 Route::post('/admin/statechange','ProspectsController@stateChange');
 Route::post('/admin/uploadcsv','ProspectsController@uploadcsv');
 Route::get('/admin/search-prospect','ProspectsController@searchProspect');
+Route::post('/admin/delete-prospect','ProspectsController@deleteProspect');
 
 Route::resource('/admin/crm', 'CrmController');
 Route::get('/admin/select-campaign/{id}','PlaceOrderController@index');

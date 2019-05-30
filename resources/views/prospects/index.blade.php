@@ -42,6 +42,15 @@ else
 {
     $directionBy = '';
 }
+
+if (App::environment('local'))
+{
+    $env = "local";
+}
+else
+{
+    $env = "production";
+}
 ?>
 
 <head>
@@ -89,7 +98,9 @@ else
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <strong class="card-title">Prospect List</strong>
+                                <strong class="card-title" style="margin-right: 10px;">Prospect List</strong>
+
+                                <button data-toggle="modal" data-target="#deleteModal" id="deleteBtn" style="display: none;" type="button" class="btn btn-danger">Delete</button>
 
                                 <form class="pull-right" autocomplete="off" name="prospectsSearch" id="prospectsSearch" action="{{ action('ProspectsController@searchProspect') }}" method="get">
                                     <input type="text" name="search" id="search" value="<?php echo $serachTerm; ?>" placeholder=" Search by name">
@@ -100,6 +111,7 @@ else
                                 <table class="table ">
                                     <thead>
                                         <tr>
+                                            <th><input type="checkbox" name="bulkDelete" id="bulkDelete" value=""></th>
                                             <th class="serial">#</th>
                                             <th>@sortablelink('fname', 'Name')</th>
                                             <th>@sortablelink('address')</th>
@@ -117,6 +129,7 @@ else
                                         @if(!empty($allProspects))
                                             @foreach ($allProspects['data'] as $prospectKey => $prospects)
                                                 <tr>
+                                                    <td><input type="checkbox" name="prospectCheckbox" id="prospect{{$prospects['id']}}" class="eachProspect" value="{{$prospects['id']}}"></td>
                                                     <td class="serial">{{ $prospectKey+1+$resultCount }}.</td>
                                                     <td> {{ $prospects['fname'].' '.$prospects['lname'] }} </td>
                                                     <td>{{ $prospects['address'] }}</td>
@@ -135,7 +148,7 @@ else
                                                             <i class="fa fa-eye" aria-hidden="true"></i>
                                                         </a>
                                                         <a class="btn btn-success userListingAction" href="{{url('/admin/select-campaign/'.$prospects['id'])}}" role="button" title="Place Order">
-                                                            <i class="fa fa-credit-card-alt" aria-hidden="true"></i>
+                                                            <i class="fa fa-cart-plus" aria-hidden="true"></i>
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -219,20 +232,46 @@ else
                                     <h1>Drag and Drop file here Or Click to select file <span>(.CSV Format)</span></h1>
                                 </div>
 
-                                <!-- <i id="fileLoader" class="fa fa-spinner" style="display: none" ></i> -->
                                 <div class="pop_loader pop_loader2" id="prospectLoader" style="display: none;">
                                     <div class="lds-roller lds-roller2"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
                                 </div>
                                 <button type="submit" onclick="uploadCsvFile();" name="fileUploadBtn" id="fileUploadBtn">UPLOAD</button>
+
+                                <div id="waitingMessage" class="waitingMessage" style="display: none;"></div>
+
+                                <div class="prgrsbar" id="prgrsbarDiv" style="display: none;">
+                                    <div class="progress" style="display: block;">
+                                        <div class="bar" id="barFileUpload"></div >
+                                        <div class="percent" id="percentFileUpload">0%</div >
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>
-                    
-                   
-                    <!-- <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="staticModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title alert alert-danger">
+                            Delete Prospect !!!
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete the selected prospects ?</p>
+                    </div>
+                    <form name="deleteProspectForm" id="deleteProspectForm" method="post" action="{{ action('ProspectsController@deleteProspect') }}">
+                        {{ csrf_field() }}
+                        <input type="hidden" name="prospectIds" id="prospectIds" value="">
+                    </form>
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                        <button type="button" class="btn btn-primary" onclick="deleteUser();">Yes</button>
-                    </div> -->
+                        <button type="button" class="btn btn-primary" onclick="deleteProspects();">Yes</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -246,6 +285,64 @@ else
 @include('common/scripts')
 
 <script type="text/javascript">
+
+    var prospectValues = [];
+    var allProspectValues = '';
+            
+    /*$("#bulkDelete").click(function () {
+        $('input:checkbox').not(this).prop('checked', this.checked);
+    });*/
+
+    $('#bulkDelete').click(function(){
+        if($(this).prop("checked")) {
+            prospectValues = [];
+            $(".eachProspect").prop("checked", true);
+            $.each($("input[name='prospectCheckbox']:checked"), function(){
+                prospectValues.push($(this).val());
+            });
+        } else {
+            prospectValues = [];
+            $(".eachProspect").prop("checked", false);
+            $.each($("input[name='prospectCheckbox']:checked"), function(){
+                prospectValues.push('');
+            });
+        }
+        allProspectValues = prospectValues.join(",");
+        checkDelete(allProspectValues);
+    });
+
+    $('.eachProspect').click(function() {
+        if ($(this).is(':checked')) {
+            prospectValues.push($(this).val());
+        }
+        else
+        {
+            prospectValues.splice($.inArray($(this).val(), prospectValues),1);
+        }
+        allProspectValues = prospectValues.join(",");
+        checkDelete(allProspectValues);
+    });
+
+    function checkDelete(allProspectValues)
+    {
+        if(allProspectValues != '')
+        {
+            $("#deleteBtn").fadeIn('slow');
+        }
+        else
+        {
+            $("#deleteBtn").fadeOut('slow');
+        }
+    }
+
+    function deleteProspects()
+    {
+        $("#prospectIds").val(allProspectValues);
+        setTimeout(function(){ 
+            $("#deleteProspectForm").submit();
+        }, 200);
+    }
+
     
     var sendingFiles;
 
@@ -311,13 +408,16 @@ else
 
             fd.append('file',files);
             sendingFiles = fd;
+            showCustomMessage();
         });
     });
 
     function uploadCsvFile()
     {
         $("#prospectLoader").fadeIn('slow');
-        $("#fileUploadBtn").addClass('disableBtn').prop("disabled", true).text("Uploading, Please wait...");
+        $("#fileUploadBtn").addClass('disableBtn').prop("disabled", true).text("Uploading...");
+
+        showCustomMessage();
         
         $.ajax({
             url: "{{url('admin/uploadcsv')}}",
@@ -326,10 +426,13 @@ else
             },
             type: 'post',
             data: sendingFiles,
+
+            cache: false,
             contentType: false,
             processData: false,
-            //dataType: 'json',
-            success: function(response){
+
+            success: function(response)
+            {
                 $("#prospectLoader").fadeOut('slow');
                 $("#fileUploadBtn").removeClass('disableBtn').prop("disabled", false).text("UPLOAD");
                 
@@ -346,11 +449,44 @@ else
                     $("#successText").html(message);
                     $("#successTextH5").fadeIn('slow');
                 }
+                $("#waitingMessage").html("").fadeOut('slow');
                 setTimeout(function(){ 
                     location.reload();
                 }, 3000);
             }
         });
+    }
+
+    function showCustomMessage()
+    {
+        var currentEnv = "{{ $env }}";
+        if(currentEnv == 'local')
+        {
+            var firstMessageTimimg = 10000;
+            var secondMessageTimimg = 20000;
+            var thirdMessageTimimg = 40000;
+            var fourthMessageTimimg = 50000;
+        }
+        else
+        {
+            var firstMessageTimimg = 20000;
+            var secondMessageTimimg = 40000;
+            var thirdMessageTimimg = 100000;
+            var fourthMessageTimimg = 130000;
+        }
+
+        setTimeout(function(){ 
+            $("#waitingMessage").html('Your uploaded file is being processed.').fadeIn('slow');
+        }, firstMessageTimimg);
+        setTimeout(function(){ 
+            $("#waitingMessage").html('It seems your uploaded file contains large data. It will take some time to upload.').fadeIn('slow');
+        }, secondMessageTimimg);
+        setTimeout(function(){ 
+            $("#waitingMessage").html("Please wait for a while. It's almost there.").fadeIn('slow');
+        }, thirdMessageTimimg);
+        setTimeout(function(){ 
+            $("#waitingMessage").html("File is uploaded. It's syncing with the database. Please wait for a few more seconds.").fadeIn('slow');
+        }, fourthMessageTimimg);
     }
 </script>
 

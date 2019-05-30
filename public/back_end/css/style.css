@@ -2735,3 +2735,12 @@ label{font-size: 14px;}
   background-color: #666 !important;
   border-color: #666 !important;
 }
+.waitingMessage{
+  text-align: center;
+    font-size: 13px;
+    padding: 3px;
+    margin-top: 8px;
+    border-radius: 5px;
+    color: #D2691E;
+    font-weight: bold;
+}
