@@ -37,12 +37,12 @@ class ProspectsController extends Controller
 
         if($respone == 1)
         {
-            $allProspects = Prospect::sortable()->with('prospectCreatedUser')->select('id','fname','lname','address','state','city','zip_code','created_by','created_at')->orderBy('id', 'DESC')->simplePaginate(50)->toArray();
+            $allProspects = Prospect::sortable()->with('prospectCreatedUser')->select('id','fname','lname','address','state','city','zip_code','created_by','created_at')->where(array('status'=> 1))->orderBy('id', 'DESC')->simplePaginate(50)->toArray();
         }
         else if($respone == 0)
         {
             $userId = Session::get('userArray')['userId'];
-            $allProspects = Prospect::sortable()->with('prospectCreatedUser')->select('id','fname','lname','address','state','city','zip_code','created_by','created_at')->where(array('created_by'=> $userId))->orderBy('id', 'DESC')->simplePaginate(50)->toArray();
+            $allProspects = Prospect::sortable()->with('prospectCreatedUser')->select('id','fname','lname','address','state','city','zip_code','created_by','created_at')->where(array('created_by'=> $userId, 'status'=> 1))->orderBy('id', 'DESC')->simplePaginate(50)->toArray();
         }
         
         return view('prospects/index',compact('allProspects'));
@@ -329,18 +329,18 @@ class ProspectsController extends Controller
 
                 UploadedCsv::create($csvData);
 
-                $message = "file uploaded.";
+                $message = "You have successfully uploaded the file.";
                 $status = 1;
             }
             else
             {
-                $message = "Invalid File Extension.";
+                $message = "Your uploaded file has invalid extension. Please upload a CSV file.";
                 $status = 0;
             }
         }
         else
         {
-            $message = "file not uploaded.";
+            $message = "You haven't uploaded any file yet.";
             $status = 0;
         }
         $jsonArray = json_encode(array('message' => $message, 'status' => $status));
@@ -351,7 +351,7 @@ class ProspectsController extends Controller
     function insertBatchData($importData_arr)
     {
         DB::connection()->disableQueryLog();
-        //echo "first ".count($importData_arr)."---";
+        
         foreach($importData_arr as $key => $importData)
         {
             if($key < 3000)
@@ -376,8 +376,8 @@ class ProspectsController extends Controller
                     "status" => 1,
                     "order_place_status" => 0,
                     "created_by" => Session::get('userArray')['userId'],
-                    "created_at" => new \DateTime(),
-                    "updated_at" => new \DateTime()
+                    "created_at" => Carbon::now()->toDateTimeString(),
+                    "updated_at" => Carbon::now()->toDateTimeString()
                 );
                 unset($importData_arr[$key]);
             }
@@ -385,13 +385,10 @@ class ProspectsController extends Controller
         Prospect::insert($insertData);
 
         $importData_arr = array_values($importData_arr);
-        //echo "second ".count($importData_arr)."---";
-        //print_r($importData_arr);die;
-
+        
         if(!empty($importData_arr))
         {
             $this->insertBatchData($importData_arr);
-            //echo "then ".count($importData_arr)."---";
         }
 
         return "added";
@@ -415,5 +412,32 @@ class ProspectsController extends Controller
         //$allProspects->appends(['search' => $serachTerm]);
         //print_r($allProspects);die;
         return view('prospects/index',compact('allProspects'));
+    }
+
+    public function deleteProspect(Request $request)
+    {
+        if(!Session::get('userArray'))
+        {
+            return redirect('/admin/login');
+        }
+
+        $prospectIds = $request->input('prospectIds');
+
+        $prospectIdArray = explode(",",$prospectIds);
+
+        if(!empty($prospectIdArray))
+        {
+            foreach ($prospectIdArray as $key => $prospectId) {
+                $updateData = array(
+                    'status' => 2,
+                    'updated_at' => Carbon::now()->toDateTimeString()
+                );
+
+                DB::table('prospects')->where('id', $prospectId)->update($updateData);
+            }
+
+            Session::flash('successMessage','You have successfully deleted your selected prospects.');
+            return redirect('/admin/prospects');
+        }
     }
 }
