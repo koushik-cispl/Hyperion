@@ -113,10 +113,10 @@
                                     @endif
                                     </div>
                         </div>
-                        <div class="row form-group">
+                        {{-- <div class="row form-group">
                            <div class="col col-md-4"> <label for="exampleInputName2" class="pr-1  form-control-label"> Price:</label></div>
                            <div class="col-12 col-md-8"> <input type="text" id="ProductPrice" disabled="disabled" name="ProductPrice" class="form-control"></div>
-                        </div>
+                        </div> --}}
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="exampleInputName2" class="pr-1  form-control-label">Quantity:</label></div>
                            <div class="col-12 col-md-8"> <input type="text" id="quantity" onkeyup="QtyChange(this.value);" name="quantity" class="form-control"></div>
@@ -252,7 +252,7 @@
                             <div class="row form-group">
                             <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing First Name:</label></div>
                                 <div class="col-12 col-md-8">
-                                    <input type="text" id="BillingFirstName" value="" name="BillingFirstName" class="form-control">
+                                    <input type="text" id="BillingFirstName" value="{{ old('BillingFirstName') }}" name="BillingFirstName" class="form-control">
                                         @if ($errors->has('BillingFirstName'))
                                             @foreach ($errors->get('BillingFirstName') as $error)
                                             <span class="help-block formValidationError">{{ $error }}</span>
@@ -262,7 +262,7 @@
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing Last Name:</label></div>
-                                <div class="col-12 col-md-8"><input type="text" id="BillingLastName" name="BillingLastName" class="form-control">
+                            <div class="col-12 col-md-8"><input type="text" value="{{ old('BillingLastName') }}" id="BillingLastName" name="BillingLastName" class="form-control">
                                     @if ($errors->has('BillingLastName'))
                                         @foreach ($errors->get('BillingLastName') as $error)
                                             <span class="help-block formValidationError">{{ $error }}</span>
@@ -272,7 +272,7 @@
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing Address:</label></div>
-                                <div class="col-12 col-md-8"><input type="text" id="BillingAddress" name="BillingAddress" class="form-control">
+                                <div class="col-12 col-md-8"><input type="text" value="{{ old('BillingAddress') }}" id="BillingAddress" name="BillingAddress" class="form-control">
                                 @if ($errors->has('BillingAddress'))
                                             @foreach ($errors->get('BillingAddress') as $error)
                                                 <span class="help-block formValidationError">{{ $error }}</span>
@@ -282,11 +282,11 @@
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing Address2:</label></div>
-                                <div class="col-12 col-md-8"><input type="text" id="BillingAddress2" name="BillingAddress2" class="form-control"></div>
+                                <div class="col-12 col-md-8"><input type="text" value="{{ old('BillingAddress2') }}" id="BillingAddress2" name="BillingAddress2" class="form-control"></div>
                             </div>
                             <div class="row form-group">
                                 <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing City:</label></div>
-                                <div class="col-12 col-md-8"><input type="text" id="BillingCity" name="BillingCity" class="form-control">
+                                <div class="col-12 col-md-8"><input type="text" value="{{ old('BillingCity') }}" id="BillingCity" name="BillingCity" class="form-control">
                                 @if ($errors->has('BillingCity'))
                                             @foreach ($errors->get('BillingCity') as $error)
                                                 <span class="help-block formValidationError">{{ $error }}</span>
@@ -295,7 +295,7 @@
                                     </div>
                             </div>
                             <div class="row form-group">
-                                <div class="col col-md-4"><label for="text-input" class=" form-control-label">Billing Zip Code:</label></div>
+                                <div class="col col-md-4"><label for="text-input" value="{{ old('BillingZipCode') }}" class=" form-control-label">Billing Zip Code:</label></div>
                                 <div class="col-12 col-md-8"><input type="tel" id="BillingZipCode" name="BillingZipCode" class="form-control">
                                     @if ($errors->has('BillingZipCode'))
                                             @foreach ($errors->get('BillingZipCode') as $error)
@@ -319,7 +319,7 @@
                                         <?php $states = \Helpers::get_states(); ?>
                                         <option value="">Select State</option>
                                         @foreach ($states  as $key => $value)
-                                        <option value="{{$key}}">{{$value}}</option>
+                                        <option value="{{$key}}" {{ (collect(old('BillingState'))->contains('key')) ? 'selected':'' }}>{{$value}}</option>
                                         @endforeach
                                     </select>
                                     @if ($errors->has('BillingState'))
@@ -419,9 +419,9 @@
                                 <div class="col-12 col-md-8">
                                 <select name="CardType" id="cc_type_n" class="form-control select-fld">
                                     <option value="">Card Type</option>
-                                    <option value="visa">Visa</option>
-                                    <option value="master">Master Card</option>
-                                    <option value="discover">Discover</option>
+                                    <option value="visa" {{ (collect(old('CardType'))->contains('visa')) ? 'selected':'' }}>Visa</option>
+                                    <option value="master" {{ (collect(old('CardType'))->contains('master')) ? 'selected':'' }}>Master Card</option>
+                                    <option value="discover" {{ (collect(old('CardType'))->contains('discover')) ? 'selected':'' }}>Discover</option>
                                 </select>
                                 @if ($errors->has('CardType'))
                                      @foreach ($errors->get('CardType') as $error)
@@ -444,12 +444,12 @@
                           <div class="col col-md-4"><label for="select" class=" form-control-label">Expiration Date:</label></div>
                                 <div class="col-12 col-md-8">
                                     <div class="row">
-                                    <div class="col-12 col-md-6">
+                                    <div class="col-12 col-md-7">
                                 <select name="ExpMonth" id="ExpMonth" class="form-control">
                                     <?php $months = \Helpers::get_months(); ?>
-                                    <option value=""> Select Month</option>
+                                    <option value=""> Select Months</option>
                                     @foreach ($months  as $key=>$value)
-                                    <option value="{{$key}}"> ({{$key}}) {{$value}}</option>
+                                    <option value="{{$key}}" {{ (collect(old('ExpMonth'))->contains($key)) ? 'selected':'' }}> ({{$key}}) {{$value}}</option>
                                     @endforeach
                                 </select>
                                 @if ($errors->has('ExpMonth'))
@@ -458,9 +458,13 @@
                                         @endforeach
                                     @endif
                                     </div>
-                                    <div class="col-12 col-md-6">
+                                    <div class="col-12 col-md-5">
                                  <select name="ExpYear" id="ExpYear" class="form-control">
-                                    {!! \Helpers::get_years(); !!}
+                                    <?php $year = \Helpers::get_years(); 
+                                    for ($i = $year; $i < $year + 20; $i++) {
+                                    $yr = substr( $i, -2 ); ?>
+                                <option value="{{$yr}}" {{ (collect(old('ExpYear'))->contains($yr)) ? 'selected':'' }}>{{$i}}</option>
+                            <?php } ?>
                                     
                                 </select>
                                 @if ($errors->has('ExpYear'))
@@ -600,7 +604,6 @@
             data: 'shipping_id=' + shipping_id,
             dataType: "json",
             success: function(res) {
-                
                 var ship_price = parseFloat(res.initial_amount);
                 console.log(ship_price);
                 $('.pop_loader').hide();
@@ -611,30 +614,7 @@
     }
     $('#affiliate_wrap').click(function(){
         $('.affiliate_wrap').toggle('slow');
-    })
-
-     function creditCardTypeFromNumber(num) {
-       num = num.replace(/[^\d]/g,'');
-       if (num.match(/^5[1-5]\d{14}$/)) {
-         return 'master';
-       } else if (num.match(/^4\d{15}/) || num.match(/^4\d{12}/)) {
-         return 'visa';
-       } else if (num.match(/^6011\d{12}/)) {
-         return 'discover';
-       }
-       return '';
-    }
-    $('#CreditCard').keyup(function(){
-        var cardNumber_length = $(this).val().length;
-        console.log(cardNumber_length);
-        if(cardNumber_length >= 6){
-            var selected_card = $("#cc_type_n option:selected").val();
-            $('#cc_type_n option[value="'+selected_card+'"]').attr('selected', false);
-            var cardType = creditCardTypeFromNumber($(this).val());
-            $('#cc_type_n option[value="'+cardType+'"]').attr('selected', true);
-        }
     });
-
 
 </script>
 </body>

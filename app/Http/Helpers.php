@@ -102,11 +102,7 @@ class Helpers
     public static function get_years()
     {
         $year = date('Y');
-        $options = '<option value="">Year</option>';
-        for ($i = $year; $i < $year + 20; $i++) {
-            $options .= sprintf('<option value="%s">%s</option>', substr($i, 2), $i);
-        }
-        return $options;
+        return $year;
     }
 
     public static function get_states()
