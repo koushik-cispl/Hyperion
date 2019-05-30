@@ -319,35 +319,8 @@ class ProspectsController extends Controller
                 }
                 fclose($file);
 
-                //print_r($importData_arr);die;
                 // Insert to MySQL database
-                foreach($importData_arr as $key => $importData)
-                {
-                    //$parts = preg_split('/[\t]/', $importData[0]);
-                    $insertData = array(
-                        "fname" => $importData[0],
-                        "lname" => $importData[1],
-                        "p_key" => $importData[3],
-                        "address" => $importData[4],
-                        "address2" => $importData[5],
-                        "city" => $importData[6],
-                        "state" => $importData[7],
-                        "zip_code" => $importData[8],
-                        "plus4" => $importData[9],
-                        "delivery_p" => $importData[10],
-                        "crrt" => $importData[11],
-                        "check_digi" => $importData[12],
-                        "return_cod" => $importData[13],
-                        "dpv" => $importData[14],
-                        "lot" => $importData[15],
-                        "finder" => $importData[16],
-                        "status" => 1,
-                        "order_place_status" => 0,
-                        "created_by" => Session::get('userArray')['userId']
-                    );
-                    //print_r($insertData);
-                    Prospect::create($insertData);
-                }
+                $addToDb = $this->insertBatchData($importData_arr);
 
                 $csvData = array(
                     'uploaded_by' => Session::get('userArray')['userId'],
@@ -373,6 +346,55 @@ class ProspectsController extends Controller
         $jsonArray = json_encode(array('message' => $message, 'status' => $status));
         echo $jsonArray;
         exit;
+    }
+
+    function insertBatchData($importData_arr)
+    {
+        DB::connection()->disableQueryLog();
+        //echo "first ".count($importData_arr)."---";
+        foreach($importData_arr as $key => $importData)
+        {
+            if($key < 3000)
+            {
+                $insertData[] = array(
+                    "fname" => $importData[0],
+                    "lname" => $importData[1],
+                    "p_key" => $importData[3],
+                    "address" => $importData[4],
+                    "address2" => $importData[5],
+                    "city" => $importData[6],
+                    "state" => $importData[7],
+                    "zip_code" => $importData[8],
+                    "plus4" => $importData[9],
+                    "delivery_p" => $importData[10],
+                    "crrt" => $importData[11],
+                    "check_digi" => $importData[12],
+                    "return_cod" => $importData[13],
+                    "dpv" => $importData[14],
+                    "lot" => $importData[15],
+                    "finder" => $importData[16],
+                    "status" => 1,
+                    "order_place_status" => 0,
+                    "created_by" => Session::get('userArray')['userId'],
+                    "created_at" => new \DateTime(),
+                    "updated_at" => new \DateTime()
+                );
+                unset($importData_arr[$key]);
+            }
+        }
+        Prospect::insert($insertData);
+
+        $importData_arr = array_values($importData_arr);
+        //echo "second ".count($importData_arr)."---";
+        //print_r($importData_arr);die;
+
+        if(!empty($importData_arr))
+        {
+            $this->insertBatchData($importData_arr);
+            //echo "then ".count($importData_arr)."---";
+        }
+
+        return "added";
     }
 
     public function searchProspect(Request $request)
