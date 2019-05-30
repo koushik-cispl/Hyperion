@@ -345,10 +345,11 @@ class ProspectsController extends Controller
                         "order_place_status" => 0,
                         "created_by" => Session::get('userArray')['userId']
                     );
-                    //print_r($insertData);
-                    Prospect::create($insertData);
+                    
+                    //Prospect::create($insertData);
                 }
-
+                print_r($insertData);
+                exit;
                 $csvData = array(
                     'uploaded_by' => Session::get('userArray')['userId'],
                     'file_name' => $fullFilename,
