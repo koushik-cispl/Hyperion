@@ -408,7 +408,6 @@ else
 
             fd.append('file',files);
             sendingFiles = fd;
-            showCustomMessage();
         });
     });
 
