@@ -19,7 +19,7 @@ class PlaceOrderController extends Controller
     
     public function index($prospectId)
     {
-        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','address2','state','city','zip_code','order_place_status','order_id')->where(array('id'=> $prospectId))->first()->toArray();
+        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','address2','state','city','zip_code','order_place_status','order_id','p_key')->where(array('id'=> $prospectId))->first()->toArray();
 
         if($prospectDetails['order_place_status'] == 1)
         {
