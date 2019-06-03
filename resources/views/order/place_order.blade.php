@@ -354,7 +354,7 @@
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">C2:</label></div>
-                           <div class="col-12 col-md-3"> <input type="text" name="C2" class="form-control"></div>
+                           <div class="col-12 col-md-3"> <input type="text" value="{{ $prospectDetails['p_key'] }}" name="C2" class="form-control"></div>
                         <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">C3:</label></div>
                            <div class="col-12 col-md-3"> <input type="text"  name="C3" class="form-control"></div>
                         </div>
