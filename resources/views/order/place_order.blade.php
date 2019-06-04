@@ -51,13 +51,14 @@
                         
                             <div class="col-12 col-md-8">
                                 <select class="form-control" onchange="ChangeCampaign($(this).val());" name="campaignId" id="campaignId" >
-                                    <option value="">Select Campaign</option>
-                                    <?php array_walk($campaign_id, function ($campaign_id,$key) use ($campaign_name) { 
-                                    ?>
-                                    <option value="<?php echo $campaign_id; ?>"><?php echo '('.$campaign_id.') '. $campaign_name[$key];  ?></option> 
-                                    <?php
-                                        });
-                                        ?>
+                                    <option>Select Campaign</option>
+                                    <?php 
+                                    if (!empty($camp_arr)) {
+                                        for ($i=1; $i < count($camp_arr); $i++){?>
+                                        <option value='{{$camp_arr[$i]->campaign_id}}'>( {{$camp_arr[$i]->campaign_id}} ) {{$camp_arr[$i]->campaign_name}} </option>;
+                                        <?php }}else{
+                                            echo '<option>No campaign found</option>';
+                                        } ?>
                                 </select>
                                     @if ($errors->has('campaignId'))
                                         @foreach ($errors->get('campaignId') as $error)
@@ -81,6 +82,7 @@
                            <div class="col-12 col-md-8"> 
                                <select class="form-control" name="offer_id" id="offer_id">
                                     <option value="">Select Offer:</option>
+                                    
                                 </select>
                                  @if ($errors->has('offer_id'))
                                         @foreach ($errors->get('offer_id') as $error)
@@ -348,7 +350,7 @@
                         </div>
                         <div class="row form-group">
                             <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">AFFID:</label></div>
-                           <div class="col-12 col-md-3"> <input type="text" name="AFFID" class="form-control"></div>
+                           <div class="col-12 col-md-3"> <input type="text" name="AFFID" value="{{ $prospectDetails['affid'] }}" class="form-control"></div>
                         <div class="col col-md-3"><label for="exampleInputName2" class="pr-1  form-control-label">C1:</label></div>
                            <div class="col-12 col-md-3"> <input type="text" name="C1" class="form-control"></div>
                         </div>
@@ -417,11 +419,13 @@
                         <div class="row form-group">
                           <div class="col col-md-4"><label for="select" class=" form-control-label">Payment Type:</label></div>
                                 <div class="col-12 col-md-8">
-                                <select name="CardType" id="cc_type_n" class="form-control select-fld">
+                                <select name="CardType" id="cc_type_n" onchange="cardType(this.value);" class="form-control select-fld">
                                     <option value="">Card Type</option>
                                     <option value="visa" {{ (collect(old('CardType'))->contains('visa')) ? 'selected':'' }}>Visa</option>
                                     <option value="master" {{ (collect(old('CardType'))->contains('master')) ? 'selected':'' }}>Master Card</option>
                                     <option value="discover" {{ (collect(old('CardType'))->contains('discover')) ? 'selected':'' }}>Discover</option>
+                                    <option value="offline" >Offline Payment</option>
+                                    <option value="amex" {{ (collect(old('CardType'))->contains('amex')) ? 'selected':'' }}>American Express</option>
                                 </select>
                                 @if ($errors->has('CardType'))
                                      @foreach ($errors->get('CardType') as $error)
@@ -430,6 +434,7 @@
                                     @endif
                             </div>
                         </div>
+                        <div class="card-option">
                         <div class="row form-group">
                             <div class="col col-md-4"><label for="text-input" class=" form-control-label">Credit Card Number:</label></div>
                             <div class="col-12 col-md-8"><input type="tel" maxlength="16" id="CreditCard" name="CreditCard" class="form-control" value="{{ old('CreditCard') }}" onkeyup="javascript:this.value=this.value.replace(/[^0-9]/g,'');">
@@ -444,10 +449,10 @@
                           <div class="col col-md-4"><label for="select" class=" form-control-label">Expiration Date:</label></div>
                                 <div class="col-12 col-md-8">
                                     <div class="row">
-                                    <div class="col-12 col-md-7">
+                                    <div class="col-12 col-md-6">
                                 <select name="ExpMonth" id="ExpMonth" class="form-control">
                                     <?php $months = \Helpers::get_months(); ?>
-                                    <option value=""> Select Months</option>
+                                    <option value=""> Month</option>
                                     @foreach ($months  as $key=>$value)
                                     <option value="{{$key}}" {{ (collect(old('ExpMonth'))->contains($key)) ? 'selected':'' }}> ({{$key}}) {{$value}}</option>
                                     @endforeach
@@ -458,8 +463,9 @@
                                         @endforeach
                                     @endif
                                     </div>
-                                    <div class="col-12 col-md-5">
+                                    <div class="col-12 col-md-6">
                                  <select name="ExpYear" id="ExpYear" class="form-control">
+                                     <option value=""> Year</option>
                                     <?php $year = \Helpers::get_years(); 
                                     for ($i = $year; $i < $year + 20; $i++) {
                                     $yr = substr( $i, -2 ); ?>
@@ -486,7 +492,8 @@
                                     @endif
                                 </div>
                         </div>
-                        <button type="submit" class="btn btn-success btn-sm">
+                        </div>
+                        <button type="submit" class="btn btn-success btn-sm submit_btn">
                                      Process Order
                                 </button>
                     </div>
@@ -615,6 +622,18 @@
     $('#affiliate_wrap').click(function(){
         $('.affiliate_wrap').toggle('slow');
     });
+
+    function cardType(val){
+        console.log(val);
+        if (val == 'offline') {
+            $('.card-option').hide('slow');
+        }
+        else
+        {
+             $('.card-option').show('slow');
+        }
+    }
+
 
 </script>
 </body>

@@ -50,43 +50,43 @@ class CrmController extends Controller
         {
             return redirect('/admin/login');
         }
-
         $this->validate($request,[
             'crm_name' => 'required',
             'endpoint' => 'required',
             'crm_user' => 'required',
             'crm_password' => 'required',
         ]);
-
-        $methodName = 'validate_credentials';
-        //if (is_array($credential) && !empty($credential)) {
-            $params = array(
-                'username' => $request->crm_user,
-                'password' => $request->crm_password,
-                'method'   => $methodName,
-            );
-            //print_r($params);
-            $url      = 'https://'.$request->endpoint. '/admin/membership.php';
-            //echo $url;
-           // $url = "https://greenvalley.limelightcrm.com/admin/membership.php";
-            $response = Helpers::cradentialValidation($url, $params);
-            if ($response == 100) {
+        $url = 'https://' . $request->input('endpoint') . '/api/v1/validate_credentials';
+        $loginInfo = 'Basic '. base64_encode($request->input('crm_user').':'.$request->input('crm_password'));
+        $response = Helpers::validate_data($loginInfo,$url);
+        $content = json_decode($response);
+        
+        if ($content != NULL)
+        {  dd($content);
+          
+            if ($content->response_code == 100) 
+            {
                 $crm = new CrmConfiguration();
                 $crm->api_name = $request->crm_name;
                 $crm->api_endpoint = $request->endpoint;
                 $crm->api_username = $request->crm_user;
                 $crm->api_password = $request->crm_password;
-
                 $crm->save();
                 return redirect()->route('crm.index')->with('successMessage','CRM added Successfully');
-                
-            } else if ($response == 200) {
+            } 
+            else if ($content->response_code == 200) 
+            {
                 return redirect()->back()->with("errorMessage","Please try with correct Username and password!");
             }
-            else{
-                return redirect()->back()->with("errorMessage", "Credential are wrong, please try with correct credential!");
-
+            else
+            {
+                return redirect()->back()->with("errorMessage", "Credential is wrong, please try with correct credential!");
             }
+        }
+        else
+        {
+            return redirect()->back()->with("errorMessage", "Limelight Instance is wrong!");
+        }
     }
 
     /**
@@ -137,36 +137,35 @@ class CrmController extends Controller
             'crm_user' => 'required',
             'crm_password' => 'required',
         ]);
-
-        $methodName = 'validate_credentials';
-        //if (is_array($credential) && !empty($credential)) {
-            $params = array(
-                'username' => $request->crm_user,
-                'password' => $request->crm_password,
-                'method'   => $methodName,
-            );
-            //print_r($params);
-            $url      = 'https://'.$request->endpoint. '/admin/membership.php';
-            //echo $url;
-           // $url = "https://greenvalley.limelightcrm.com/admin/membership.php";
-            $response = Helpers::cradentialValidation($url, $params);
-            if ($response == 100) {
+        $url = 'https://' . $request->input('endpoint') . '/api/v1/validate_credentials';
+        $loginInfo = 'Basic '. base64_encode($request->input('crm_user').':'.$request->input('crm_password'));
+        $response = Helpers::validate_data($loginInfo,$url);
+        $content = json_decode($response);
+        if ($content != NULL) 
+        { 
+            if ($content->response_code == 100) 
+            {
                 $crm = CrmConfiguration::find($id);
                 $crm->api_name = $request->crm_name;
                 $crm->api_endpoint = $request->endpoint;
                 $crm->api_username = $request->crm_user;
                 $crm->api_password = $request->crm_password;
-
                 $crm->save();
                 return redirect()->route('crm.index')->with('successMessage','CRM updated Successfully');
-                
-            } else if ($response == 200) {
+            } 
+            else if ($content->response_code == 200) 
+            {
                 return redirect()->back()->with("errorMessage","Please try with correct Username and password!");
             }
-            else{
-                return redirect()->back()->with("errorMessage", "Credential are wrong, please try with correct credential!");
-
+            else
+            {
+                return redirect()->back()->with("errorMessage", "Credential is wrong, please try with correct credential!");
             }
+        }
+        else
+        {
+            return redirect()->back()->with("errorMessage", "Limelight Instance is wrong!");
+        }
     }
 
     /**

@@ -28,8 +28,9 @@
                                         <div class="card-title">
                                             <h3 class="text-center">New CRM Details</h3>
                                         </div>
-                                        
-
+                                        <div class="form-error">
+                                            @include('common.message-show')
+                                        </div>
                                         <hr>
                                      <form action="{{route('crm.store')}}" method="POST" name="result-form" enctype="multipart/form-data">
                                         {{ csrf_field() }}
