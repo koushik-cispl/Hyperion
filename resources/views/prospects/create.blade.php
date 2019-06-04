@@ -245,10 +245,10 @@
                                             <div class="row">
                                                 <div class="col-6">
                                                     <div class="form-group">
-                                                        <label for="afid" class="control-label mb-1">AFID</label>
-                                                        <input id="afid" name="afid" type="text" class="form-control @if ($errors->has('afid')) is-invalid @endif" value="{{ old('afid') }}">
-                                                        @if ($errors->has('afid'))
-                                                            @foreach ($errors->get('afid') as $error)
+                                                        <label for="affid" class="control-label mb-1">affid</label>
+                                                        <input id="affid" name="affid" type="text" class="form-control @if ($errors->has('affid')) is-invalid @endif" value="{{ old('affid') }}">
+                                                        @if ($errors->has('affid'))
+                                                            @foreach ($errors->get('affid') as $error)
                                                                 <span class="help-block formValidationError">{{ $error }}</span>
                                                             @endforeach
                                                         @endif
