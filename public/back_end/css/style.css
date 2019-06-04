@@ -2742,3 +2742,10 @@ label{font-size: 14px;}
     color: #D2691E;
     font-weight: bold;
 }
+.submit_btn{
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 26px;
+}
