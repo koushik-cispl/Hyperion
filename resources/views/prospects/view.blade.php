@@ -149,6 +149,14 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label for="afid" class="control-label mb-1">AFID</label>
+                                                    <input id="afid" name="afid" type="text" class="form-control" value="{{ $prospectDetails['afid'] }}" readonly="readonly">
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
