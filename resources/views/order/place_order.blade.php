@@ -52,13 +52,12 @@
                             <div class="col-12 col-md-8">
                                 <select class="form-control" onchange="ChangeCampaign($(this).val());" name="campaignId" id="campaignId" >
                                     <option>Select Campaign</option>
-                                    <?php 
-                                    if (!empty($camp_arr)) {
-                                        for ($i=1; $i < count($camp_arr); $i++){?>
-                                        <option value='{{$camp_arr[$i]->campaign_id}}'>( {{$camp_arr[$i]->campaign_id}} ) {{$camp_arr[$i]->campaign_name}} </option>;
-                                        <?php }}else{
-                                            echo '<option>No campaign found</option>';
-                                        } ?>
+                                    <?php if(!empty($camp_arr)) {
+                                        foreach ($camp_arr as $key => $value) { ?>
+                                            <option value="{{ $value->campaign_id }}">({{ $value->campaign_id }}) {{ $value->campaign_name }}</option>
+                                    <?php } } else { ?>
+                                        <option>Campaign not found</option>
+                                    <?php } ?>
                                 </select>
                                     @if ($errors->has('campaignId'))
                                         @foreach ($errors->get('campaignId') as $error)
