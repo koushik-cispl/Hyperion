@@ -89,6 +89,7 @@ class ProspectsController extends Controller
             'dpv' => '',
             'lot' => '',
             'finder' => '',
+            'afid' => '',
             'p_key' => ''
         ]);
 
@@ -110,6 +111,7 @@ class ProspectsController extends Controller
             'dpv' => $request->input('dpv'),
             'lot' => $request->input('lot'),
             'finder' => $request->input('finder'),
+            'afid' => $request->input('afid'),
             'p_key' => $request->input('key'),
             'status' => 1,
             'order_place_status' => 0,
@@ -135,7 +137,7 @@ class ProspectsController extends Controller
             return redirect('/admin/login');
         }
 
-        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','address2','state','city','zip_code','plus4','delivery_p','crrt','check_digi','return_cod','dpv','lot','finder','p_key')->where(array('id'=> $id))->first()->toArray();
+        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','address2','state','city','zip_code','plus4','delivery_p','crrt','check_digi','return_cod','dpv','lot','finder','afid','p_key')->where(array('id'=> $id))->first()->toArray();
         //print_r($prospectDetails);die;
         return view('prospects/view',compact('prospectDetails'));
     }
@@ -153,7 +155,7 @@ class ProspectsController extends Controller
             return redirect('/admin/login');
         }
 
-        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','address2','state','city','zip_code','plus4','delivery_p','crrt','check_digi','return_cod','dpv','lot','finder','p_key')->where(array('id'=> $id))->first()->toArray();
+        $prospectDetails = Prospect::select('id','fname','lname','email','mobile','address','address2','state','city','zip_code','plus4','delivery_p','crrt','check_digi','return_cod','dpv','lot','finder','afid','p_key')->where(array('id'=> $id))->first()->toArray();
 
         return view('prospects/edit',compact('prospectDetails'));
     }
@@ -190,6 +192,7 @@ class ProspectsController extends Controller
             'dpv' => '',
             'lot' => '',
             'finder' => '',
+            'afid' => '',
             'p_key' => ''
         ]);
 
@@ -211,6 +214,7 @@ class ProspectsController extends Controller
             'dpv' => $request->input('dpv'),
             'lot' => $request->input('lot'),
             'finder' => $request->input('finder'),
+            'afid' => $request->input('afid'),
             'p_key' => $request->input('key'),
             'status' => 1,
             'order_place_status' => 0,
@@ -305,15 +309,15 @@ class ProspectsController extends Controller
 
                 while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
                     
-                    $num = count($filedata );
+                    $num = count($filedata);
 
                     // Skip first row (Remove below comment if you want to skip the first row)
                     if($i == 0){
                         $i++;
-                        continue; 
+                        continue;
                     }
                     for ($c=0; $c < $num; $c++) {
-                        $importData_arr[$i][] = $filedata [$c];
+                        $importData_arr[$i][] = $filedata[$c];
                     }
                     $i++;
                 }
@@ -354,7 +358,7 @@ class ProspectsController extends Controller
         
         foreach($importData_arr as $key => $importData)
         {
-            if($key < 3000)
+            if($key < 2500)
             {
                 $insertData[] = array(
                     "fname" => $importData[0],
@@ -373,6 +377,7 @@ class ProspectsController extends Controller
                     "dpv" => $importData[14],
                     "lot" => $importData[15],
                     "finder" => $importData[16],
+                    "afid" => $importData[17],
                     "status" => 1,
                     "order_place_status" => 0,
                     "created_by" => Session::get('userArray')['userId'],
